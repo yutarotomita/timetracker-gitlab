@@ -1,0 +1,164 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <!-- <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script> -->
+  <link href="./styles.css" rel="stylesheet">
+  <script src="./dist/apps/popup.ts.bundle.js"></script>
+</head>
+<body style="width: 500px;">
+  <div class="container-fluid px-3 pt-3 sticky-top shadow-sm bg-light">
+    <div class="row d-flex justify-content-between">
+      <div class="col-8">
+        <div class="row">
+          <div class="col-4">
+            <span class="milestone-label">1/1</span>
+          </div>
+          <div class="col-8">
+            elapsed: <span class="total-elapsedTime">0h</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-2">
+        <button id="spend-button" class="btn btn-primary">Spent</button>
+      </div>
+      <div class="col-2">
+        <div class="dropdown">
+          <span class="dropdown-toggle" data-bs-toggle="dropdown" ><img class="profile-avatar"src="icon.png" style="width: 35px; height: 35px; border-radius: 50%;"></span>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <li><a class="dropdown-item" href="./setting.html">Settings</a></li>
+            <li><a class="dropdown-item export-json" href="#">Export JSON</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+    </div>
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link active"
+          id="home-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#home"
+          type="button"
+          role="tab"
+          aria-controls="home"
+          aria-selected="true"
+        >
+          Tracker
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          id="profile-tab"
+          data-bs-toggle="tab"
+          data-bs-target="#profile"
+          type="button"
+          role="tab"
+          aria-controls="profile"
+          aria-selected="false"
+        >
+          WorkingTime
+        </button>
+      </li>
+    </ul>
+  </div>
+
+
+  <div class="tab-content" id="myTabContent">
+    <!-- トラッカータブ -->
+    <div
+      class="tab-pane fade show active"
+      id="home"
+      role="tabpanel"
+      aria-labelledby="home-tab"
+    >
+      <div class="container my-2">
+        <div class="row d-flex justify-content-center">
+          <!-- <div class="col-12 my-2" style="display: flex;justify-content: center;">
+            <button class="btn btn-success col-12" title="New issue" id="new_issue_link">New issue</button>
+          </div>
+          <div class="form-floating mb-1">
+            <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+            <label for="floatingInput">Doing...</label>
+          </div> -->
+          <div class="col-12">
+            <ul id="issue-list" class="list-group list-group-flush">
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 実績タブ -->
+    <div 
+      class="tab-pane fade"
+      id="profile"
+      role="tabpanel"
+      aria-labelledby="profile-tab"
+    >
+      <div class="container my-2">
+        <div class="row d-flex justify-content-center">
+          <div class="col-12">
+            <div id="workingTime-sticky-list">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <template id="workingTime-list-item-template">
+    <div class="card list-item mb-2">
+      <div class="card-header workingTime-header">
+        <div class="row">
+          <span class="workingTime-title text-truncate col-9">999999: TaskTitle</span>
+          <span class="workingTime-spendTime col-2">04:30</span>
+          <button type="button" class="btn-close workingTime-deleteButton" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="card-body workingTime-body hide">
+        Time Edit
+        <div class="row d-flex justify-content-evenly">
+          0<input type="range" class="form-range workingTime-range" min="0" max="40" step="5" id="" style="width:85%">x2
+        </div>
+      </div>
+    </div>
+  </template>
+  <template id="issue-list-item-template">
+    <li class="list-group-item d-flex justify-content-between align-items-start list-group-item-action">
+      <div style="width: 90%">
+        <div class="row pb-2">
+          <span class="stickyNote-title" style="font-size: 0.9em; font-weight: bold;">999999: TaskTitle</span>
+        </div>
+        <div class="row">
+          <div class="col-11">
+            <div class="progress stickyNote-progress" style="height:0.9rem">
+              <div class="stickyNote-progress-bar-1 progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+                <span><span class="stickyNote-spendTime">1.0</span>h</span>
+              </div>
+              <div class="stickyNote-progress-bar-2 progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+                <span>+<span class="stickyNote-elapsedTime">0</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="width: 10%;">
+        <div>
+          <span class="stickyNote-badge badge rounded-pill">Badge</span>
+        </div>
+        <div style="display: flex;justify-content: center;align-items: center;" class="d-flex align-items-stretch py-2">
+          <img class="stickyNote-profile-avatar px-auto" src="icon.png" style="width: 1.8rem; height: 1.8rem; border-radius: 50%;">
+        </div>
+      </div>
+    </li>
+  </template>
+  <script src="./src/third-party/bootstrap.bundle.min.js"></script>
+</body>
+</html>
