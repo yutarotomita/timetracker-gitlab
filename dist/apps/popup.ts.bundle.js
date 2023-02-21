@@ -1964,16 +1964,22 @@ var gitLabApiClient;
 // ------------------------------------- 処理内容 ---------------------------------------- //
 document.addEventListener("DOMContentLoaded", function () {
     return __awaiter(this, void 0, void 0, function () {
+        var isLogined;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     localStorageClient = new _domain_localStorageWindow__WEBPACK_IMPORTED_MODULE_12__.LocalStorageWindow(); //LocalStorageChrome()
                     return [4 /*yield*/, loginCheck()];
                 case 1:
-                    _a.sent();
-                    gitLabApiClient = new _domain_gitlab_gitLabApi__WEBPACK_IMPORTED_MODULE_6__.GitLabApi(new _domain_gitlab_gitLabProjcetAccessTokens__WEBPACK_IMPORTED_MODULE_5__.GitLabProjectAccessTokens(PRIVATE_TOKEN, GITLAB_DOMAIN, PROJECT_ID));
-                    preFetchAjax();
-                    initialize();
+                    isLogined = _a.sent();
+                    if (isLogined) {
+                        gitLabApiClient = new _domain_gitlab_gitLabApi__WEBPACK_IMPORTED_MODULE_6__.GitLabApi(new _domain_gitlab_gitLabProjcetAccessTokens__WEBPACK_IMPORTED_MODULE_5__.GitLabProjectAccessTokens(PRIVATE_TOKEN, GITLAB_DOMAIN, PROJECT_ID));
+                        preFetchAjax();
+                        initialize();
+                    }
+                    else {
+                        window.location.href = './setting.html';
+                    }
                     return [2 /*return*/];
             }
         });
@@ -2002,9 +2008,10 @@ function loginCheck() {
                         PRIVATE_TOKEN = privateToken;
                         GITLAB_DOMAIN = gitLabDomain;
                         PROJECT_ID = gitLabProjectId;
+                        return [2 /*return*/, true];
                     }
                     else {
-                        window.location.href = './setting.html';
+                        return [2 /*return*/, false];
                     }
                     return [2 /*return*/];
             }
@@ -2054,23 +2061,24 @@ function initialize() {
                 case 1:
                     _a.sent();
                     temp_issueList = [];
-                    // イシュー取得
+                    if (!(0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_16__.isDefined)(milestoneLabel.getMilestone())) return [3 /*break*/, 4];
                     return [4 /*yield*/, gitLabApiClient.getAjaxIssue(function (rslt) {
                             rslt.forEach(function (issue) {
                                 temp_issueList.push(new _domain_gitlab_gitLabIssue__WEBPACK_IMPORTED_MODULE_9__.GitLabIssue(issue));
                             });
-                        }, milestoneLabel.getMilestone() /* Nullチェック */, 1)];
+                        }, milestoneLabel.getMilestone(), 1)];
                 case 2:
-                    // イシュー取得
                     _a.sent();
                     return [4 /*yield*/, gitLabApiClient.getAjaxIssue(function (rslt) {
                             rslt.forEach(function (issue) {
                                 temp_issueList.push(new _domain_gitlab_gitLabIssue__WEBPACK_IMPORTED_MODULE_9__.GitLabIssue(issue));
                             });
-                        }, milestoneLabel.getMilestone() /* Nullチェック */, 2)];
+                        }, milestoneLabel.getMilestone(), 2)];
                 case 3:
                     _a.sent();
                     issueList.set(temp_issueList);
+                    _a.label = 4;
+                case 4:
                     filterParam = new _domain_issueParam__WEBPACK_IMPORTED_MODULE_11__.IssueParam();
                     if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_16__.isDefined)(loginUser.getId())) {
                         filterParam.setUserId(loginUser.getId());
@@ -2080,7 +2088,7 @@ function initialize() {
                     stickyNoteList.set(issueList.filter(filterParam));
                     setEventListener();
                     return [4 /*yield*/, revertToBeforeState()];
-                case 4:
+                case 5:
                     _a.sent();
                     return [2 /*return*/];
             }
@@ -2104,7 +2112,7 @@ function revertToBeforeState() {
                     return [4 /*yield*/, localStorageClient.getObject(KEY_WORKINGTIMES)];
                 case 3:
                     workingTimes = _a.sent();
-                    if (workingTimes.length > 0) {
+                    if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_16__.isDefined)(workingTimes) && workingTimes.length > 0) {
                         workingTimes.forEach(function (workingTimeObj) {
                             // 内部的な実績に反映
                             var workingTime = new _domain_workingTime__WEBPACK_IMPORTED_MODULE_13__.WorkingTime(workingTimeObj.startDate, workingTimeObj.elapsedTime, workingTimeObj.taskId, workingTimeObj.taskName);

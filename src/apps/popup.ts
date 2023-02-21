@@ -76,14 +76,15 @@ let gitLabApiClient: GitLabApi
 // ------------------------------------- 処理内容 ---------------------------------------- //
 document.addEventListener("DOMContentLoaded", async function(){
 	localStorageClient = new LocalStorageWindow() //LocalStorageChrome()
-	await loginCheck()
-	
-	gitLabApiClient = new GitLabApi(new GitLabProjectAccessTokens(PRIVATE_TOKEN, GITLAB_DOMAIN, PROJECT_ID))
-
-
-	preFetchAjax()
-	initialize()
-
+	const isLogined = await loginCheck()
+	if(isLogined){
+		gitLabApiClient = new GitLabApi(new GitLabProjectAccessTokens(PRIVATE_TOKEN, GITLAB_DOMAIN, PROJECT_ID))
+		preFetchAjax()
+		initialize()
+	}
+	else {
+		window.location.href = './setting.html'
+	}
 });
 
 // ------------------------------------- 以下ファンクション ---------------------------------------- //
@@ -100,8 +101,9 @@ async function loginCheck(){
 		PRIVATE_TOKEN = privateToken
 		GITLAB_DOMAIN = gitLabDomain
 		PROJECT_ID = gitLabProjectId
+		return true
 	} else {
-		window.location.href = './setting.html'
+		return false
 	}
 }
 
@@ -142,17 +144,19 @@ async function initialize(){
 	
 	let temp_issueList: Array<IIssue> = []
 	// イシュー取得
-	await gitLabApiClient.getAjaxIssue((rslt: any) => {
-		rslt.forEach((issue: IIssue)=>{
-			temp_issueList.push(new GitLabIssue(issue))
-		})
-	}, milestoneLabel.getMilestone()!/* Nullチェック */, 1)
-	await gitLabApiClient.getAjaxIssue((rslt: any) => {
-		rslt.forEach((issue: IIssue)=>{
-			temp_issueList.push(new GitLabIssue(issue))
-		})
-	}, milestoneLabel.getMilestone()!/* Nullチェック */, 2)
-	issueList.set(temp_issueList)
+	if(isDefined(milestoneLabel.getMilestone())){
+		await gitLabApiClient.getAjaxIssue((rslt: any) => {
+			rslt.forEach((issue: IIssue)=>{
+				temp_issueList.push(new GitLabIssue(issue))
+			})
+		}, milestoneLabel.getMilestone()!, 1)
+		await gitLabApiClient.getAjaxIssue((rslt: any) => {
+			rslt.forEach((issue: IIssue)=>{
+				temp_issueList.push(new GitLabIssue(issue))
+			})
+		}, milestoneLabel.getMilestone()!, 2)
+		issueList.set(temp_issueList)
+	}
 
 	// イシューを絞り込んで表示要素にセット
 	const filterParam = new IssueParam()
@@ -175,9 +179,9 @@ async function revertToBeforeState(){
 
 	startDate = await localStorageClient.getObject(KEY_START_DATE)
 
-	let workingTimes: Array<WorkingTime> = await localStorageClient.getObject(KEY_WORKINGTIMES)
-	if(workingTimes.length > 0 ){
-		workingTimes.forEach((workingTimeObj: any)=>{
+	let workingTimes: Array<WorkingTime> | undefined = await localStorageClient.getObject(KEY_WORKINGTIMES)
+	if(isDefined(workingTimes) && workingTimes!.length > 0 ){
+		workingTimes!.forEach((workingTimeObj: any)=>{
 			// 内部的な実績に反映
 			const workingTime = new WorkingTime(workingTimeObj.startDate, workingTimeObj.elapsedTime, workingTimeObj.taskId, workingTimeObj.taskName)
 			workingTimeList.add(workingTime)
