@@ -262,6 +262,10 @@ var Time = /** @class */ (function () {
     Time.milisecondsToSeconds = function (ms) {
         return Math.round(ms / 1000);
     };
+    // 分をミリ秒に変換する
+    Time.minuteToMiliSeconds = function (minutes) {
+        return minutes * 1000 * 60;
+    };
     // 小数点第〇位を四捨五入する
     Time.roundOffTwoDecimalPlaces = function (seconds, decimalPlace) {
         return Math.round(seconds * (Math.pow(10, (decimalPlace - 1)))) / (Math.pow(10, (decimalPlace - 1)));
@@ -1646,20 +1650,39 @@ var WorkingTimeSticky = /** @class */ (function () {
         titleDom.innerHTML = workingTime.getTaskName();
         var spendTimeDom = this.dom.querySelector(WorkingTimeSticky.SELECTOR_SPEND_TIME()); //Nullチェック
         spendTimeDom.innerHTML = String(_common_time__WEBPACK_IMPORTED_MODULE_3__.Time.secondsToclock(workingTime.getElapsedTime()));
-        var rangeDom = this.dom.querySelector(WorkingTimeSticky.SELECTOR_RANGE()) //Nullチェック
-        , rangeValue = workingTime.getElapsedTime(), rangeMax = rangeValue * 2 > 10 * 1000 * 60 ? rangeValue * 2 : 10 * 1000 * 60, rangeStep = Math.round(rangeValue / 10);
-        rangeDom.setAttribute('max', String(rangeMax));
-        rangeDom.setAttribute('step', String(rangeStep));
-        rangeDom.setAttribute('value', String(rangeValue));
-        // 実績時間編集用の横スクロールバーが動かされた時のイベント登録
-        rangeDom.addEventListener('input', function () {
-            spendTimeDom.innerHTML = String(_common_time__WEBPACK_IMPORTED_MODULE_3__.Time.secondsToclock(Number(rangeDom.value)));
-        });
-        rangeDom.addEventListener('change', function () {
-            _this.workingTime.setElapsedTime(Number(rangeDom.value));
+        var elapsedTimeDom = this.dom.querySelector(WorkingTimeSticky.SELECTOR_ELAPSEDTIME()) //Nullチェック
+        , elapsedTimeValue = workingTime.getElapsedTime();
+        elapsedTimeDom.setAttribute('value', String(_common_time__WEBPACK_IMPORTED_MODULE_3__.Time.secondsToMinute(_common_time__WEBPACK_IMPORTED_MODULE_3__.Time.milisecondsToSeconds(elapsedTimeValue))));
+        // elapsedTimeが変更された時のイベント登録
+        elapsedTimeDom.addEventListener('change', function () {
+            spendTimeDom.innerHTML = String(_common_time__WEBPACK_IMPORTED_MODULE_3__.Time.secondsToclock(_common_time__WEBPACK_IMPORTED_MODULE_3__.Time.minuteToMiliSeconds(Number(elapsedTimeDom.value))));
+            _this.workingTime.setElapsedTime(_common_time__WEBPACK_IMPORTED_MODULE_3__.Time.minuteToMiliSeconds(Number(elapsedTimeDom.value)));
             _this.eventAfterChange();
         });
-        // クリックされたときのイベント登録
+        // addボタンがクリックされたときのイベント登録
+        var addDoms = this.dom.querySelectorAll(WorkingTimeSticky.SELECTOR_ADD()); //Nullチェック
+        addDoms.forEach(function (addDom) {
+            addDom.addEventListener('click', function () {
+                var dataMinutes = addDom.dataset.minitue;
+                var elappsedTime = Number(elapsedTimeDom.value) + Number(dataMinutes);
+                elapsedTimeDom.value = String(elappsedTime);
+                _this.workingTime.setElapsedTime(_common_time__WEBPACK_IMPORTED_MODULE_3__.Time.minuteToMiliSeconds(elappsedTime));
+                spendTimeDom.innerHTML = String(_common_time__WEBPACK_IMPORTED_MODULE_3__.Time.secondsToclock(_common_time__WEBPACK_IMPORTED_MODULE_3__.Time.minuteToMiliSeconds(elappsedTime)));
+                _this.eventAfterChange();
+            });
+        });
+        // subボタンがクリックされたときのイベント登録
+        var subDoms = this.dom.querySelectorAll(WorkingTimeSticky.SELECTOR_SUB()); //Nullチェック
+        subDoms.forEach(function (subDom) {
+            subDom.addEventListener('click', function () {
+                var dataMinutes = subDom.dataset.minitue;
+                var elappsedTime = Number(elapsedTimeDom.value) - Number(dataMinutes) < 0 ? 0 : Number(elapsedTimeDom.value) - Number(dataMinutes);
+                elapsedTimeDom.value = String(elappsedTime);
+                _this.workingTime.setElapsedTime(_common_time__WEBPACK_IMPORTED_MODULE_3__.Time.minuteToMiliSeconds(elappsedTime));
+                spendTimeDom.innerHTML = String(_common_time__WEBPACK_IMPORTED_MODULE_3__.Time.secondsToclock(_common_time__WEBPACK_IMPORTED_MODULE_3__.Time.minuteToMiliSeconds(elappsedTime)));
+                _this.eventAfterChange();
+            });
+        });
         var headerDom = this.dom.querySelector(WorkingTimeSticky.SELECTOR_HEADER()); //Nullチェック
         headerDom.addEventListener('click', function () {
             _this.switchSelect();
@@ -1719,8 +1742,14 @@ var WorkingTimeSticky = /** @class */ (function () {
     WorkingTimeSticky.SELECTOR_BODY = function () {
         return ".workingTime-body";
     };
-    WorkingTimeSticky.SELECTOR_RANGE = function () {
-        return ".workingTime-range";
+    WorkingTimeSticky.SELECTOR_ADD = function () {
+        return ".workingTime-add";
+    };
+    WorkingTimeSticky.SELECTOR_SUB = function () {
+        return ".workingTime-sub";
+    };
+    WorkingTimeSticky.SELECTOR_ELAPSEDTIME = function () {
+        return ".workingTime-elapsedTime";
     };
     WorkingTimeSticky.SELECTOR_DELETE_BUTTON = function () {
         return ".workingTime-deleteButton";
@@ -2166,15 +2195,11 @@ function setEventListener() {
     // Spendボタン押下時のイベントハンドラを設定
     spendButton.addListenerClickAfter(function () {
         // スペントする？
-        var spentOk = confirm('WorkingTime spent ok????');
+        var spentOk = confirm('実績がクリアされます。\r\nGitLabに実績を送信してよろしいですか？\r\n Are you want to spend on GitLab?');
         if (spentOk) {
             workingTimeList.getAll().forEach(function (workingTime) {
                 gitLabApiClient.postAjaxSpentIssue(function () { }, workingTime.getTaskId(), workingTime.getTime());
             });
-        }
-        // ローカルの実績クリアする？
-        var deleteOk = confirm('WorkingTime delete ok????');
-        if (deleteOk) {
             stickyNoteList.clearAll();
             workingTimeList.clear();
             totalElapsedTime.set(0);
@@ -2224,7 +2249,7 @@ function setEventListener() {
     // Export JSON
     document.querySelector('.export-json').addEventListener('click', function () {
         var jsonText = JSON.stringify(workingTimeList.getAll());
-        navigator.clipboard.writeText(jsonText).then(function () { return alert('クリップボードにJSON形式でコピーしました。'); }).catch(function (e) { return alert('コピー時にエラー！ ' + e.message); });
+        navigator.clipboard.writeText(jsonText).then(function () { return alert('クリップボードにコピーしました。'); }).catch(function (e) { return alert('コピー時にエラー！ ' + e.message); });
     });
 }
 

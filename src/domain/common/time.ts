@@ -42,6 +42,11 @@ export class Time{
     	return Math.round (ms / 1000)
 	}
 
+	// 分をミリ秒に変換する
+	static minuteToMiliSeconds(minutes: number){
+		return minutes * 1000 * 60
+	}
+
 	// 小数点第〇位を四捨五入する
 	static roundOffTwoDecimalPlaces(seconds: number, decimalPlace: number){
 		return Math.round(seconds * (10 ** (decimalPlace-1) )) / (10 ** (decimalPlace-1))

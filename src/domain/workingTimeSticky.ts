@@ -66,24 +66,43 @@ export class WorkingTimeSticky{
 		titleDom.innerHTML = workingTime.getTaskName()
 		const spendTimeDom = this.dom.querySelector(WorkingTimeSticky.SELECTOR_SPEND_TIME())! //Nullチェック
 		spendTimeDom.innerHTML = String(Time.secondsToclock(workingTime.getElapsedTime()))
-		const rangeDom: HTMLInputElement = this.dom.querySelector(WorkingTimeSticky.SELECTOR_RANGE())! //Nullチェック
-			, rangeValue = workingTime.getElapsedTime()
-			, rangeMax = rangeValue*2 > 10 * 1000 * 60 ? rangeValue*2 : 10 * 1000 * 60
-			, rangeStep = Math.round(rangeValue/10)
-		rangeDom.setAttribute('max', String(rangeMax))
-		rangeDom.setAttribute('step', String(rangeStep))
-		rangeDom.setAttribute('value', String(rangeValue))
-
-		// 実績時間編集用の横スクロールバーが動かされた時のイベント登録
-		rangeDom.addEventListener('input', () => {
-			spendTimeDom.innerHTML = String(Time.secondsToclock(Number(rangeDom.value)))
-		})
-		rangeDom.addEventListener('change', () => {
-			this.workingTime!.setElapsedTime(Number(rangeDom.value))
+		const elapsedTimeDom: HTMLInputElement = this.dom.querySelector(WorkingTimeSticky.SELECTOR_ELAPSEDTIME())! //Nullチェック
+			, elapsedTimeValue = workingTime.getElapsedTime()
+		elapsedTimeDom.setAttribute('value', String(Time.secondsToMinute(Time.milisecondsToSeconds(elapsedTimeValue))))
+		
+		// elapsedTimeが変更された時のイベント登録
+		elapsedTimeDom.addEventListener('change', () => {
+			spendTimeDom.innerHTML = String(Time.secondsToclock(Time.minuteToMiliSeconds(Number(elapsedTimeDom.value))))
+			this.workingTime!.setElapsedTime(Time.minuteToMiliSeconds(Number(elapsedTimeDom.value)))
 			this.eventAfterChange()
+		}) 
+
+		// addボタンがクリックされたときのイベント登録
+		const addDoms: NodeListOf<HTMLElement> = this.dom.querySelectorAll(WorkingTimeSticky.SELECTOR_ADD())! //Nullチェック
+		addDoms.forEach((addDom)=>{
+			addDom.addEventListener('click', () => {
+				const dataMinutes = addDom.dataset.minitue
+				const elappsedTime = Number(elapsedTimeDom.value) + Number(dataMinutes)
+				elapsedTimeDom.value = String(elappsedTime)
+				this.workingTime!.setElapsedTime(Time.minuteToMiliSeconds(elappsedTime))
+				spendTimeDom.innerHTML = String(Time.secondsToclock(Time.minuteToMiliSeconds(elappsedTime)))
+				this.eventAfterChange()
+			})
+		})
+		// subボタンがクリックされたときのイベント登録
+		const subDoms: NodeListOf<HTMLElement> =  this.dom.querySelectorAll(WorkingTimeSticky.SELECTOR_SUB())! //Nullチェック
+		subDoms.forEach((subDom)=>{
+			subDom.addEventListener('click', () => {
+				const dataMinutes = subDom.dataset.minitue
+				const elappsedTime = Number(elapsedTimeDom.value) - Number(dataMinutes) < 0 ? 0 : Number(elapsedTimeDom.value) - Number(dataMinutes) 
+				elapsedTimeDom.value = String(elappsedTime)
+				this.workingTime!.setElapsedTime(Time.minuteToMiliSeconds(elappsedTime))
+				spendTimeDom.innerHTML = String(Time.secondsToclock(Time.minuteToMiliSeconds(elappsedTime)))
+				this.eventAfterChange()
+			})
+
 		})
 
-		// クリックされたときのイベント登録
 		const headerDom = this.dom.querySelector(WorkingTimeSticky.SELECTOR_HEADER())! //Nullチェック
 		headerDom.addEventListener('click', () => {
 			this.switchSelect()
@@ -154,8 +173,16 @@ export class WorkingTimeSticky{
 		return ".workingTime-body"
 	}
 
-	static SELECTOR_RANGE(){
-		return ".workingTime-range"
+	static SELECTOR_ADD(){
+		return ".workingTime-add"
+	}
+
+	static SELECTOR_SUB(){
+		return ".workingTime-sub"
+	}
+
+	static SELECTOR_ELAPSEDTIME(){
+		return ".workingTime-elapsedTime"
 	}
 
 	static SELECTOR_DELETE_BUTTON(){

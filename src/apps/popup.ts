@@ -235,15 +235,11 @@ function setEventListener(){
 	// Spendボタン押下時のイベントハンドラを設定
 	spendButton.addListenerClickAfter(()=>{
 		// スペントする？
-		const spentOk = confirm('WorkingTime spent ok????')
+		const spentOk = confirm('実績がクリアされます。\r\nGitLabに実績を送信してよろしいですか？\r\n Are you want to spend on GitLab?')
 		if(spentOk){
 			workingTimeList.getAll().forEach((workingTime)=>{
 				gitLabApiClient.postAjaxSpentIssue(()=>{}, workingTime.getTaskId(), workingTime.getTime())
 			})
-		}
-		// ローカルの実績クリアする？
-		const deleteOk = confirm('WorkingTime delete ok????')
-		if(deleteOk){
 			stickyNoteList.clearAll()
 			workingTimeList.clear()
 			totalElapsedTime.set(0)
@@ -297,6 +293,6 @@ function setEventListener(){
 	// Export JSON
 	document.querySelector('.export-json')!.addEventListener('click', ()=>{
 		const jsonText = JSON.stringify(workingTimeList.getAll())
-		navigator.clipboard.writeText(jsonText).then(()=>alert('クリップボードにJSON形式でコピーしました。')).catch(e=>alert('コピー時にエラー！ '+e.message));
+		navigator.clipboard.writeText(jsonText).then(()=>alert('クリップボードにコピーしました。')).catch(e=>alert('コピー時にエラー！ '+e.message));
 	})
 }

@@ -2,10 +2,6 @@
 <head>
   <meta charset="UTF-8">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <!-- <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script> -->
   <link href="./styles.css" rel="stylesheet">
   <script src="./dist/apps/popup.ts.bundle.js"></script>
 </head>
@@ -30,7 +26,7 @@
           <span class="dropdown-toggle" data-bs-toggle="dropdown" ><img class="profile-avatar"src="icon.png" style="width: 35px; height: 35px; border-radius: 50%;"></span>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
             <li><a class="dropdown-item" href="./setting.html">Settings</a></li>
-            <li><a class="dropdown-item export-json" href="#">Export JSON</a></li>
+            <li><a class="dropdown-item export-json" href="#">Export JSON　<i class="bi bi-clipboard"></i></a></li>
           </ul>
         </div>
       </div>
@@ -123,8 +119,23 @@
         </div>
       </div>
       <div class="card-body workingTime-body hide">
-        Time Edit
+        <div class="row d-flex justify-content-evenly" style="font-size: .8rem; font-weight: 300;">
+          minutes
+        </div>
         <div class="row d-flex justify-content-evenly">
+          <div class="col-5 d-flex justify-content-center align-items-end">
+            <button type="button" class="btn btn-outline-secondary mx-1 workingTime-sub" data-minitue="60" style="height: fit-content;">-1.0h</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm mx-1 workingTime-sub" data-minitue="30" style="height: fit-content;">-30m</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm mx-1 workingTime-sub" data-minitue="5" style="height: fit-content;">-5m</button>
+          </div>
+          <input type="number" value="350" class="col workingTime-elapsedTime">
+          <div class="col-5 d-flex justify-content-center align-items-end">
+            <button type="button" class="btn btn-outline-primary btn-sm mx-1 workingTime-add" data-minitue="5" style="height: fit-content;">+5m</button>
+            <button type="button" class="btn btn-outline-primary btn-sm mx-1 workingTime-add" data-minitue="30" style="height: fit-content;">+30m</button>
+            <button type="button" class="btn btn-outline-primary mx-1 workingTime-add" data-minitue="60" style="height: fit-content;">+1.0h</button>
+          </div>
+        </div>
+        <div class="row justify-content-evenly" style="display: none;">
           0<input type="range" class="form-range workingTime-range" min="0" max="40" step="5" id="" style="width:85%">x2
         </div>
       </div>
@@ -160,5 +171,6 @@
     </li>
   </template>
   <script src="./src/third-party/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
 </body>
 </html>
