@@ -1,5 +1,5 @@
 import { Template } from "../domain/common/template"
-import { IIssue } from "./IIssue"
+import { IIssue } from "./iIssue"
 import { Time } from "./common/time"
 import { isDefined } from "../function/nullCheck"
 import { Bootstrap5 } from "./boostrap5"

@@ -247,8 +247,8 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
 
 
 var localStorageClient = new _domain_localStorageWindow__WEBPACK_IMPORTED_MODULE_0__.LocalStorageWindow(); //LocalStorageChrome()
-// storageKeyで共通化したい
-var KEY_SELECT_ISSUE_ID = 'select_issue_id', KEY_START_DATE = 'start_date', KEY_WORKINGTIMES = 'workingtimes', KEY_PRIVATE_TOKEN = 'private_token', KEY_GITLAB_DOMAIN = 'gitlab_domain', KEY_GITLAB_PROJECT_ID = 'gitlab_project_id';
+// storageKeyはpopup.tsと共通化してください。不要なものも一律コピペする運用
+var KEY_SELECT_ISSUE_ID = 'select_issue_id', KEY_START_DATE = 'start_date', KEY_WORKINGTIMES = 'workingtimes', KEY_ISSUE_LIST = 'issue_list', KEY_PRIVATE_TOKEN = 'private_token', KEY_GITLAB_DOMAIN = 'gitlab_domain', KEY_GITLAB_PROJECT_ID = 'gitlab_project_id', KEY_IS_OUTPUT_JSON_WHEN_SPENT = 'is_output_json_when_spent';
 document.addEventListener("DOMContentLoaded", function () {
     initialize();
     addEventListener();
@@ -264,10 +264,13 @@ function initialize() {
                     return [4 /*yield*/, localStorageClient.getObject(KEY_PRIVATE_TOKEN)];
                 case 2:
                     privateToken = _a.sent();
-                    return [4 /*yield*/, localStorageClient.getObject(KEY_GITLAB_PROJECT_ID)];
+                    return [4 /*yield*/, localStorageClient.getObject(KEY_GITLAB_PROJECT_ID)
+                        // , isOutputJsonWhenSpent = await localStorageClient.getObject(KEY_IS_OUTPUT_JSON_WHEN_SPENT)
+                    ];
                 case 3:
                     keyGitLabProjectId = _a.sent();
                     forms = document.forms[0], elemGitLabDomain = forms.gitLabDomain, elemPrivateToken = forms.privateToken, elemProjectId = forms.projectId;
+                    // , elemIsOutputJsonWhenSpent: HTMLInputElement = forms.isOutputJsonWhenSpent
                     if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_1__.isDefined)(gitLabDomain))
                         elemGitLabDomain.setAttribute("value", gitLabDomain);
                     if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_1__.isDefined)(privateToken))
@@ -283,13 +286,13 @@ function addEventListener() {
     var elemSubmitButton = document.querySelector('.submit-button');
     elemSubmitButton.addEventListener('click', function () {
         var forms = document.forms[0], gitLabDomain = forms.gitLabDomain.value, privateToken = forms.privateToken.value, projectId = forms.projectId.value;
-        // const gitLabApi = new GitLabApi(new GitLabProjectAccessTokens(privateToken, gitLabDomain, projectId))
-        // gitLabApi.getLoginUser()
+        // , isOutputJsonWhenSpent: boolean = forms.isOutputJsonWhenSpent.checked == true
         var isAccess = true;
         if (isAccess) {
-            localStorageClient.setObject(KEY_GITLAB_DOMAIN, forms.gitLabDomain.value);
-            localStorageClient.setObject(KEY_PRIVATE_TOKEN, forms.privateToken.value);
-            localStorageClient.setObject(KEY_GITLAB_PROJECT_ID, forms.projectId.value);
+            localStorageClient.setObject(KEY_GITLAB_DOMAIN, gitLabDomain);
+            localStorageClient.setObject(KEY_PRIVATE_TOKEN, privateToken);
+            localStorageClient.setObject(KEY_GITLAB_PROJECT_ID, projectId);
+            // localStorageClient.setObject(KEY_IS_OUTPUT_JSON_WHEN_SPENT, isOutputJsonWhenSpent)
             window.location.href = './popup.html';
         }
     });

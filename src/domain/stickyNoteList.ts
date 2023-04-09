@@ -95,20 +95,6 @@ export class StickyNoteList{
       }
     }
   
-    /**
-     * FIXME: リファクタしたので、問題なければ消す
-     * 任意のidの付箋をこっそり内部的に選択状態にする
-     * @param {Number} index
-     * @param {Number} startDate
-     */
-    // selectHidden(index: number, startDate?: number){
-    //   if(isDefined(startDate)){
-    //     this.selectedIndex = index
-    //     this.selectedId = this.stickyNotes[index].getId()
-    //     this.stickyNotes[index].select(startDate)
-    //   }
-    // }
-  
     getAll(){
         return this.stickyNotes
     }

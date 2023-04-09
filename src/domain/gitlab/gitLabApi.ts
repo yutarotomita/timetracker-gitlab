@@ -29,22 +29,21 @@ export class GitLabApi{
 	 * GET /projects/:id/milestones
 	 * @param {*} callback 
 	 */
-	async getAjaxMilestone(callback: Function){
-		let url = this.createBaseUrl()
-		url.pathname = url.pathname + '/projects/' + this.getProjectId() + '/milestones'
-		await this.getAjax(url, callback)
-	}
+	// async getAjaxMilestone(callback: Function){
+	// 	let url = this.createBaseUrl()
+	// 	url.pathname = url.pathname + '/projects/' + this.getProjectId() + '/milestones'
+	// 	await this.getAjax(url, callback)
+	// }
 
 	/**
 	 * GET /projects/:id/issues
 	 * @param {*} callback 
 	 * @param {*} milestone 
 	 */
-	async getAjaxIssue(callback: Function, milestone: IMilestone, page?: Number){
-		page = isUndefined(page) ? 1 : page
+	async getAjaxIssue(callback: Function, perPage: number, page: number){
 		let url = this.createBaseUrl()
 		url.pathname = url.pathname + '/projects/' + this.getProjectId() + '/issues'
-		url.search = '?milestone=' + milestone.getLabel() + '&per_page=100&page=' + page // FIXME: 100件以上取得できるようにする（ページングに対応）
+		url.search = '?per_page=' + perPage + '&page=' + page
 		await this.getAjax(url, callback)
 	}
 

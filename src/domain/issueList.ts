@@ -1,4 +1,4 @@
-import { IIssue } from "./IIssue"
+import { IIssue } from "./iIssue"
 import { IUser } from "./iUser"
 import { IssueParam } from "./issueParam"
 import { isDefined } from "../function/nullCheck"
@@ -21,6 +21,10 @@ export class IssueList{
 		this.issueList = issues
 	}
 
+	add(issue: IIssue){
+		this.issueList.push(issue)
+	}
+
 	getById(id: number){
 		return this.issueList.find(issue=> issue.getId() == id)
 	}
@@ -31,6 +35,14 @@ export class IssueList{
 	 */
 	getIssueList(){
 		return this.issueList
+	}
+
+	/**
+	 * issue.idを重複なしの配列形式で返却する
+	 */
+	getAllIds(){
+		const ids = this.issueList.map(issue => issue.id)
+		return Array.from(new Set(ids))
 	}
 
 	// リストに含まれるユーザーを配列形式で返却する

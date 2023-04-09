@@ -2,7 +2,7 @@ import { WorkingTimeSticky } from "./workingTimeSticky"
 import { WorkingTimeList } from "./workingTimeList"
 import { ElementId } from "./element/elementId"
 import { WorkingTime } from "./workingTime"
-import { IStickyList } from "./IStickyList"
+import { IStickyList } from "./iStickyList"
 import { isDefined, isUndefined } from "../function/nullCheck"
 
 export class WorkingTimeStickyList implements IStickyList{

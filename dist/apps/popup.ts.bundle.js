@@ -2,131 +2,6 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./src/domain/WorkingTimeStickyList.ts":
-/*!*********************************************!*\
-  !*** ./src/domain/WorkingTimeStickyList.ts ***!
-  \*********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "WorkingTimeStickyList": () => (/* binding */ WorkingTimeStickyList)
-/* harmony export */ });
-/* harmony import */ var _workingTimeSticky__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./workingTimeSticky */ "./src/domain/workingTimeSticky.ts");
-/* harmony import */ var _workingTimeList__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./workingTimeList */ "./src/domain/workingTimeList.ts");
-/* harmony import */ var _function_nullCheck__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../function/nullCheck */ "./src/function/nullCheck.ts");
-
-
-
-var WorkingTimeStickyList = /** @class */ (function () {
-    function WorkingTimeStickyList(domId) {
-        this.eventAfterChange = function () { };
-        this.dom = document.getElementById(domId.getString());
-        this.workingTimeStickies = [];
-    }
-    /**
-     * 作業実績リストからDOM要素を追加
-     * @param {WorkingTimeList} WorkingTimeList
-     */
-    WorkingTimeStickyList.prototype.set = function (workingTimeList) {
-        var _this = this;
-        this.workingTimeStickies = [];
-        this.dom.innerHTML = ''; // FIXME: innerHTMLで子要素を削除するのは非推奨。whileで回すかjquery.remove()を使う
-        workingTimeList.getAll().forEach(function (workingTime) {
-            _this.add(workingTime);
-        });
-    };
-    /**
-     *
-     * @param workingTime
-     */
-    WorkingTimeStickyList.prototype.add = function (workingTime, isPrepend) {
-        var _this = this;
-        if (isPrepend === void 0) { isPrepend = false; }
-        var index = this.workingTimeStickies.length;
-        // 各付箋の要素を生成
-        var workingTimeSticky = new _workingTimeSticky__WEBPACK_IMPORTED_MODULE_0__.WorkingTimeSticky(workingTime, index);
-        this.workingTimeStickies.push(workingTimeSticky);
-        if (isPrepend) {
-            this.dom.prepend(workingTimeSticky.getDom());
-        }
-        else {
-            this.dom.append(workingTimeSticky.getDom());
-        }
-        // クローズボタンクリック時のイベントハンドラを設定
-        var selfId = workingTimeSticky.getId();
-        workingTimeSticky.addListenerCloseButtonClickAfter(function () {
-            _this.delete(selfId);
-            _this.eventAfterChange();
-        });
-        workingTimeSticky.addEventListenerAfterChange(function () {
-            _this.eventAfterChange();
-        });
-        return index;
-    };
-    /**
-     * Deleteボタンクリック時のイベントハンドラを設定する
-     * @param action(WorkingTimeList)  除外済みのWorkingTimeListを引数としたFunction
-     */
-    WorkingTimeStickyList.prototype.addListenerChangeAfter = function (action) {
-        this.eventAfterChange = action;
-    };
-    /**
-     * WorkingTimeSticky（実績の付箋）IDからindexを取得する
-     * @param id
-     * @returns IDに合致するindex。それ以外の場合は -1 を返します。
-     */
-    WorkingTimeStickyList.prototype.getIndex = function (id) {
-        return this.workingTimeStickies.findIndex(function (workingTimeSticky) { return id == workingTimeSticky.getId(); });
-    };
-    /**
-     * 実績の付箋を削除する
-     * @param index インデックス番号
-     * @returns
-     */
-    WorkingTimeStickyList.prototype.delete = function (id) {
-        var index = this.getIndex(id);
-        if (index == -1) {
-            throw ("WorkingTimeStickyDelete:Invalid Index Error");
-        }
-        else {
-            // 該当する付箋を取り除く
-            var deleteWorkingTimeStickiy = this.workingTimeStickies.splice(index, 1)[0];
-            if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_2__.isUndefined)(deleteWorkingTimeStickiy)) {
-                throw ("WorkingTimeStickyDelete:Invalid Index Error");
-            }
-            else {
-                this.updateAllIndex();
-            }
-        }
-    };
-    /**
-     * 全てのWorkingTimeStickyのインデックスを採番し直す。イベントリスナーなどで使うインデックスの整合性を取る
-     */
-    WorkingTimeStickyList.prototype.updateAllIndex = function () {
-        this.workingTimeStickies.forEach(function (workingTimeSticky, index) {
-            workingTimeSticky.setIndex(index);
-        });
-    };
-    /**
-     * WorkingTimeListを取得する。
-     */
-    WorkingTimeStickyList.prototype.getWorkingTimeList = function () {
-        var workingTimeList = new _workingTimeList__WEBPACK_IMPORTED_MODULE_1__.WorkingTimeList();
-        this.workingTimeStickies.forEach(function (workingTimeStickiey) {
-            if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_2__.isDefined)(workingTimeStickiey.getWorkingTime())) {
-                workingTimeList.add(workingTimeStickiey.getWorkingTime());
-            }
-        });
-        return workingTimeList;
-    };
-    return WorkingTimeStickyList;
-}());
-
-
-
-/***/ }),
-
 /***/ "./src/domain/boostrap5.ts":
 /*!*********************************!*\
   !*** ./src/domain/boostrap5.ts ***!
@@ -348,7 +223,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "GitLabApi": () => (/* binding */ GitLabApi)
 /* harmony export */ });
 /* harmony import */ var _common_time__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../common/time */ "./src/domain/common/time.ts");
-/* harmony import */ var _function_nullCheck__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../function/nullCheck */ "./src/function/nullCheck.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -386,7 +260,6 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
     }
 };
 
-
 var GitLabApi = /** @class */ (function () {
     function GitLabApi(gitLabProjectAccessTokens) {
         this.domain = gitLabProjectAccessTokens.getGitLabDomain();
@@ -417,37 +290,25 @@ var GitLabApi = /** @class */ (function () {
      * GET /projects/:id/milestones
      * @param {*} callback
      */
-    GitLabApi.prototype.getAjaxMilestone = function (callback) {
-        return __awaiter(this, void 0, void 0, function () {
-            var url;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        url = this.createBaseUrl();
-                        url.pathname = url.pathname + '/projects/' + this.getProjectId() + '/milestones';
-                        return [4 /*yield*/, this.getAjax(url, callback)];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
+    // async getAjaxMilestone(callback: Function){
+    // 	let url = this.createBaseUrl()
+    // 	url.pathname = url.pathname + '/projects/' + this.getProjectId() + '/milestones'
+    // 	await this.getAjax(url, callback)
+    // }
     /**
      * GET /projects/:id/issues
      * @param {*} callback
      * @param {*} milestone
      */
-    GitLabApi.prototype.getAjaxIssue = function (callback, milestone, page) {
+    GitLabApi.prototype.getAjaxIssue = function (callback, perPage, page) {
         return __awaiter(this, void 0, void 0, function () {
             var url;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        page = (0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_1__.isUndefined)(page) ? 1 : page;
                         url = this.createBaseUrl();
                         url.pathname = url.pathname + '/projects/' + this.getProjectId() + '/issues';
-                        url.search = '?milestone=' + milestone.getLabel() + '&per_page=100&page=' + page; // FIXME: 100件以上取得できるようにする（ページングに対応）
+                        url.search = '?per_page=' + perPage + '&page=' + page;
                         return [4 /*yield*/, this.getAjax(url, callback)];
                     case 1:
                         _a.sent();
@@ -569,7 +430,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "GitLabIssue": () => (/* binding */ GitLabIssue)
 /* harmony export */ });
-/* harmony import */ var _gitlabUser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./gitlabUser */ "./src/domain/gitlab/gitlabUser.ts");
+/* harmony import */ var _gitLabUser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./gitLabUser */ "./src/domain/gitlab/gitLabUser.ts");
 /* harmony import */ var _function_nullCheck__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../function/nullCheck */ "./src/function/nullCheck.ts");
 
 
@@ -577,7 +438,7 @@ __webpack_require__.r(__webpack_exports__);
 var GitLabIssue = /** @class */ (function () {
     function GitLabIssue(issue) {
         this.id = issue.iid;
-        this.assignee = issue.assignee ? new _gitlabUser__WEBPACK_IMPORTED_MODULE_0__.GitLabUser(issue.assignee) : undefined;
+        this.assignee = issue.assignee ? new _gitLabUser__WEBPACK_IMPORTED_MODULE_0__.GitLabUser(issue.assignee) : undefined;
         this.title = issue.title;
         this.timeEstimate = issue.time_stats.time_estimate;
         this.timeSpend = issue.time_stats.total_time_spent;
@@ -632,34 +493,6 @@ var GitLabIssue = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./src/domain/gitlab/gitLabMilestone.ts":
-/*!**********************************************!*\
-  !*** ./src/domain/gitlab/gitLabMilestone.ts ***!
-  \**********************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "GitLabMilestone": () => (/* binding */ GitLabMilestone)
-/* harmony export */ });
-var GitLabMilestone = /** @class */ (function () {
-    function GitLabMilestone(milestone) {
-        this.id = milestone.id;
-        this.title = milestone.title;
-    }
-    GitLabMilestone.prototype.getId = function () {
-        return this.id;
-    };
-    GitLabMilestone.prototype.getLabel = function () {
-        return this.title;
-    };
-    return GitLabMilestone;
-}());
-
-
-
-/***/ }),
-
 /***/ "./src/domain/gitlab/gitLabProjcetAccessTokens.ts":
 /*!********************************************************!*\
   !*** ./src/domain/gitlab/gitLabProjcetAccessTokens.ts ***!
@@ -701,9 +534,9 @@ var GitLabProjectAccessTokens = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./src/domain/gitlab/gitlabUser.ts":
+/***/ "./src/domain/gitlab/gitLabUser.ts":
 /*!*****************************************!*\
-  !*** ./src/domain/gitlab/gitlabUser.ts ***!
+  !*** ./src/domain/gitlab/gitLabUser.ts ***!
   \*****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -736,38 +569,6 @@ var GitLabUser = /** @class */ (function () {
         return this.profilePath;
     };
     return GitLabUser;
-}());
-
-
-
-/***/ }),
-
-/***/ "./src/domain/html/milestoneLabel.ts":
-/*!*******************************************!*\
-  !*** ./src/domain/html/milestoneLabel.ts ***!
-  \*******************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "MilestoneLabel": () => (/* binding */ MilestoneLabel)
-/* harmony export */ });
-/**
- * マイルストーンを表示する画面要素のクラス
- */
-var MilestoneLabel = /** @class */ (function () {
-    function MilestoneLabel(className) {
-        this.labelObj = document.querySelector(className.getSelector());
-        this.milestone = undefined;
-    }
-    MilestoneLabel.prototype.setMilestone = function (milestone) {
-        this.milestone = milestone;
-        this.labelObj.innerHTML = milestone.getLabel();
-    };
-    MilestoneLabel.prototype.getMilestone = function () {
-        return this.milestone;
-    };
-    return MilestoneLabel;
 }());
 
 
@@ -837,6 +638,96 @@ var TotalElapsedTime = /** @class */ (function () {
 
 /***/ }),
 
+/***/ "./src/domain/issueDto.ts":
+/*!********************************!*\
+  !*** ./src/domain/issueDto.ts ***!
+  \********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "IssueDto": () => (/* binding */ IssueDto)
+/* harmony export */ });
+/* harmony import */ var _function_nullCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../function/nullCheck */ "./src/function/nullCheck.ts");
+
+/**
+ * issueをローカルストレージで保存、復元するためのDto
+ * jsのlocalstorageはオブジェクトのfunctionをシリアライズできないため用意した
+ */
+var IssueDto = /** @class */ (function () {
+    function IssueDto(issue) {
+        this.id = issue.id;
+        this.assignee = issue.assignee ? new GitLabUserDto(issue.id, issue.assignee.userName, issue.assignee.label, issue.assignee.imgPath, issue.assignee.profilePath) : undefined;
+        this.title = issue.title;
+        this.timeEstimate = issue.timeEstimate;
+        this.timeSpend = issue.timeSpend;
+        this.labels = issue.labels;
+        this.state = issue.state;
+        this.url = issue.url;
+    }
+    IssueDto.prototype.getId = function () {
+        return this.id;
+    };
+    IssueDto.prototype.getAssignee = function () {
+        return this.assignee;
+    };
+    IssueDto.prototype.isAssign = function () {
+        return (0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_0__.isDefined)(this.assignee) ? true : false;
+    };
+    IssueDto.prototype.getTitle = function () {
+        return this.title;
+    };
+    IssueDto.prototype.getTimeEstimate = function () {
+        return this.timeEstimate ? this.timeEstimate : 0;
+    };
+    IssueDto.prototype.getTimeSpend = function () {
+        return this.timeSpend ? this.timeSpend : 0;
+    };
+    IssueDto.prototype.getLabels = function () {
+        return this.labels;
+    };
+    IssueDto.prototype.getUrl = function () {
+        return this.url;
+    };
+    /**
+     * 付箋が閉じているとき: "closed"
+     * 付箋が開いているとき: "opened"
+     */
+    IssueDto.prototype.isActive = function () {
+        return this.state == "opened" ? true : false;
+    };
+    return IssueDto;
+}());
+
+var GitLabUserDto = /** @class */ (function () {
+    function GitLabUserDto(id, userName, label, imgPath, profilePath) {
+        this.id = id;
+        this.userName = userName;
+        this.label = label;
+        this.imgPath = imgPath;
+        this.profilePath = profilePath;
+    }
+    GitLabUserDto.prototype.getId = function () {
+        return this.id;
+    };
+    GitLabUserDto.prototype.getUserName = function () {
+        return this.userName;
+    };
+    GitLabUserDto.prototype.getLabel = function () {
+        return this.label;
+    };
+    GitLabUserDto.prototype.getImgPath = function () {
+        return this.imgPath;
+    };
+    GitLabUserDto.prototype.getProfilePath = function () {
+        return this.profilePath;
+    };
+    return GitLabUserDto;
+}());
+
+
+/***/ }),
+
 /***/ "./src/domain/issueList.ts":
 /*!*********************************!*\
   !*** ./src/domain/issueList.ts ***!
@@ -863,6 +754,9 @@ var IssueList = /** @class */ (function () {
     IssueList.prototype.set = function (issues) {
         this.issueList = issues;
     };
+    IssueList.prototype.add = function (issue) {
+        this.issueList.push(issue);
+    };
     IssueList.prototype.getById = function (id) {
         return this.issueList.find(function (issue) { return issue.getId() == id; });
     };
@@ -872,6 +766,13 @@ var IssueList = /** @class */ (function () {
      */
     IssueList.prototype.getIssueList = function () {
         return this.issueList;
+    };
+    /**
+     * issue.idを重複なしの配列形式で返却する
+     */
+    IssueList.prototype.getAllIds = function () {
+        var ids = this.issueList.map(function (issue) { return issue.id; });
+        return Array.from(new Set(ids));
     };
     // リストに含まれるユーザーを配列形式で返却する
     IssueList.prototype.getUserList = function () {
@@ -1378,19 +1279,6 @@ var StickyNoteList = /** @class */ (function () {
             this.unselectAll();
         }
     };
-    /**
-     * FIXME: リファクタしたので、問題なければ消す
-     * 任意のidの付箋をこっそり内部的に選択状態にする
-     * @param {Number} index
-     * @param {Number} startDate
-     */
-    // selectHidden(index: number, startDate?: number){
-    //   if(isDefined(startDate)){
-    //     this.selectedIndex = index
-    //     this.selectedId = this.stickyNotes[index].getId()
-    //     this.stickyNotes[index].select(startDate)
-    //   }
-    // }
     StickyNoteList.prototype.getAll = function () {
         return this.stickyNotes;
     };
@@ -1767,6 +1655,131 @@ var WorkingTimeSticky = /** @class */ (function () {
 
 /***/ }),
 
+/***/ "./src/domain/workingTimeStickyList.ts":
+/*!*********************************************!*\
+  !*** ./src/domain/workingTimeStickyList.ts ***!
+  \*********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "WorkingTimeStickyList": () => (/* binding */ WorkingTimeStickyList)
+/* harmony export */ });
+/* harmony import */ var _workingTimeSticky__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./workingTimeSticky */ "./src/domain/workingTimeSticky.ts");
+/* harmony import */ var _workingTimeList__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./workingTimeList */ "./src/domain/workingTimeList.ts");
+/* harmony import */ var _function_nullCheck__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../function/nullCheck */ "./src/function/nullCheck.ts");
+
+
+
+var WorkingTimeStickyList = /** @class */ (function () {
+    function WorkingTimeStickyList(domId) {
+        this.eventAfterChange = function () { };
+        this.dom = document.getElementById(domId.getString());
+        this.workingTimeStickies = [];
+    }
+    /**
+     * 作業実績リストからDOM要素を追加
+     * @param {WorkingTimeList} WorkingTimeList
+     */
+    WorkingTimeStickyList.prototype.set = function (workingTimeList) {
+        var _this = this;
+        this.workingTimeStickies = [];
+        this.dom.innerHTML = ''; // FIXME: innerHTMLで子要素を削除するのは非推奨。whileで回すかjquery.remove()を使う
+        workingTimeList.getAll().forEach(function (workingTime) {
+            _this.add(workingTime);
+        });
+    };
+    /**
+     *
+     * @param workingTime
+     */
+    WorkingTimeStickyList.prototype.add = function (workingTime, isPrepend) {
+        var _this = this;
+        if (isPrepend === void 0) { isPrepend = false; }
+        var index = this.workingTimeStickies.length;
+        // 各付箋の要素を生成
+        var workingTimeSticky = new _workingTimeSticky__WEBPACK_IMPORTED_MODULE_0__.WorkingTimeSticky(workingTime, index);
+        this.workingTimeStickies.push(workingTimeSticky);
+        if (isPrepend) {
+            this.dom.prepend(workingTimeSticky.getDom());
+        }
+        else {
+            this.dom.append(workingTimeSticky.getDom());
+        }
+        // クローズボタンクリック時のイベントハンドラを設定
+        var selfId = workingTimeSticky.getId();
+        workingTimeSticky.addListenerCloseButtonClickAfter(function () {
+            _this.delete(selfId);
+            _this.eventAfterChange();
+        });
+        workingTimeSticky.addEventListenerAfterChange(function () {
+            _this.eventAfterChange();
+        });
+        return index;
+    };
+    /**
+     * Deleteボタンクリック時のイベントハンドラを設定する
+     * @param action(WorkingTimeList)  除外済みのWorkingTimeListを引数としたFunction
+     */
+    WorkingTimeStickyList.prototype.addListenerChangeAfter = function (action) {
+        this.eventAfterChange = action;
+    };
+    /**
+     * WorkingTimeSticky（実績の付箋）IDからindexを取得する
+     * @param id
+     * @returns IDに合致するindex。それ以外の場合は -1 を返します。
+     */
+    WorkingTimeStickyList.prototype.getIndex = function (id) {
+        return this.workingTimeStickies.findIndex(function (workingTimeSticky) { return id == workingTimeSticky.getId(); });
+    };
+    /**
+     * 実績の付箋を削除する
+     * @param index インデックス番号
+     * @returns
+     */
+    WorkingTimeStickyList.prototype.delete = function (id) {
+        var index = this.getIndex(id);
+        if (index == -1) {
+            throw ("WorkingTimeStickyDelete:Invalid Index Error");
+        }
+        else {
+            // 該当する付箋を取り除く
+            var deleteWorkingTimeStickiy = this.workingTimeStickies.splice(index, 1)[0];
+            if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_2__.isUndefined)(deleteWorkingTimeStickiy)) {
+                throw ("WorkingTimeStickyDelete:Invalid Index Error");
+            }
+            else {
+                this.updateAllIndex();
+            }
+        }
+    };
+    /**
+     * 全てのWorkingTimeStickyのインデックスを採番し直す。イベントリスナーなどで使うインデックスの整合性を取る
+     */
+    WorkingTimeStickyList.prototype.updateAllIndex = function () {
+        this.workingTimeStickies.forEach(function (workingTimeSticky, index) {
+            workingTimeSticky.setIndex(index);
+        });
+    };
+    /**
+     * WorkingTimeListを取得する。
+     */
+    WorkingTimeStickyList.prototype.getWorkingTimeList = function () {
+        var workingTimeList = new _workingTimeList__WEBPACK_IMPORTED_MODULE_1__.WorkingTimeList();
+        this.workingTimeStickies.forEach(function (workingTimeStickiey) {
+            if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_2__.isDefined)(workingTimeStickiey.getWorkingTime())) {
+                workingTimeList.add(workingTimeStickiey.getWorkingTime());
+            }
+        });
+        return workingTimeList;
+    };
+    return WorkingTimeStickyList;
+}());
+
+
+
+/***/ }),
+
 /***/ "./src/function/nullCheck.ts":
 /*!***********************************!*\
   !*** ./src/function/nullCheck.ts ***!
@@ -1880,22 +1893,21 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _domain_html_totalElapsedTime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../domain/html/totalElapsedTime */ "./src/domain/html/totalElapsedTime.ts");
 /* harmony import */ var _domain_html_spendButton__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../domain/html/spendButton */ "./src/domain/html/spendButton.ts");
-/* harmony import */ var _domain_html_milestoneLabel__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../domain/html/milestoneLabel */ "./src/domain/html/milestoneLabel.ts");
-/* harmony import */ var _domain_element_elementId__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../domain/element/elementId */ "./src/domain/element/elementId.ts");
-/* harmony import */ var _domain_element_elementClass__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../domain/element/elementClass */ "./src/domain/element/elementClass.ts");
-/* harmony import */ var _domain_gitlab_gitLabProjcetAccessTokens__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../domain/gitlab/gitLabProjcetAccessTokens */ "./src/domain/gitlab/gitLabProjcetAccessTokens.ts");
-/* harmony import */ var _domain_gitlab_gitLabApi__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../domain/gitlab/gitLabApi */ "./src/domain/gitlab/gitLabApi.ts");
-/* harmony import */ var _domain_gitlab_gitLabMilestone__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../domain/gitlab/gitLabMilestone */ "./src/domain/gitlab/gitLabMilestone.ts");
-/* harmony import */ var _domain_gitlab_gitlabUser__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../domain/gitlab/gitlabUser */ "./src/domain/gitlab/gitlabUser.ts");
-/* harmony import */ var _domain_gitlab_gitLabIssue__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../domain/gitlab/gitLabIssue */ "./src/domain/gitlab/gitLabIssue.ts");
-/* harmony import */ var _domain_issueList__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../domain/issueList */ "./src/domain/issueList.ts");
-/* harmony import */ var _domain_issueParam__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../domain/issueParam */ "./src/domain/issueParam.ts");
-/* harmony import */ var _domain_localStorageWindow__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../domain/localStorageWindow */ "./src/domain/localStorageWindow.ts");
-/* harmony import */ var _domain_workingTime__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../domain/workingTime */ "./src/domain/workingTime.ts");
-/* harmony import */ var _domain_workingTimeList__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../domain/workingTimeList */ "./src/domain/workingTimeList.ts");
-/* harmony import */ var _domain_stickyNoteList__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../domain/stickyNoteList */ "./src/domain/stickyNoteList.ts");
-/* harmony import */ var _function_nullCheck__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../function/nullCheck */ "./src/function/nullCheck.ts");
-/* harmony import */ var _domain_WorkingTimeStickyList__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../domain/WorkingTimeStickyList */ "./src/domain/WorkingTimeStickyList.ts");
+/* harmony import */ var _domain_element_elementId__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../domain/element/elementId */ "./src/domain/element/elementId.ts");
+/* harmony import */ var _domain_element_elementClass__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../domain/element/elementClass */ "./src/domain/element/elementClass.ts");
+/* harmony import */ var _domain_gitlab_gitLabProjcetAccessTokens__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../domain/gitlab/gitLabProjcetAccessTokens */ "./src/domain/gitlab/gitLabProjcetAccessTokens.ts");
+/* harmony import */ var _domain_gitlab_gitLabApi__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../domain/gitlab/gitLabApi */ "./src/domain/gitlab/gitLabApi.ts");
+/* harmony import */ var _domain_gitlab_gitLabUser__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../domain/gitlab/gitLabUser */ "./src/domain/gitlab/gitLabUser.ts");
+/* harmony import */ var _domain_gitlab_gitLabIssue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../domain/gitlab/gitLabIssue */ "./src/domain/gitlab/gitLabIssue.ts");
+/* harmony import */ var _domain_issueList__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../domain/issueList */ "./src/domain/issueList.ts");
+/* harmony import */ var _domain_issueParam__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../domain/issueParam */ "./src/domain/issueParam.ts");
+/* harmony import */ var _domain_localStorageWindow__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../domain/localStorageWindow */ "./src/domain/localStorageWindow.ts");
+/* harmony import */ var _domain_workingTime__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../domain/workingTime */ "./src/domain/workingTime.ts");
+/* harmony import */ var _domain_workingTimeList__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../domain/workingTimeList */ "./src/domain/workingTimeList.ts");
+/* harmony import */ var _domain_stickyNoteList__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../domain/stickyNoteList */ "./src/domain/stickyNoteList.ts");
+/* harmony import */ var _function_nullCheck__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../function/nullCheck */ "./src/function/nullCheck.ts");
+/* harmony import */ var _domain_workingTimeStickyList__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../domain/workingTimeStickyList */ "./src/domain/workingTimeStickyList.ts");
+/* harmony import */ var _domain_issueDto__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../domain/issueDto */ "./src/domain/issueDto.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -1942,9 +1954,8 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
 
 
 
-
-
 // import { LocalStorageChrome } from "../domain/localStorageChrome"
+
 
 
 
@@ -1956,16 +1967,17 @@ var PRIVATE_TOKEN;
 var GITLAB_DOMAIN;
 var PROJECT_ID;
 // ローカル保存用のKey
-var KEY_SELECT_ISSUE_ID = 'select_issue_id', KEY_START_DATE = 'start_date', KEY_WORKINGTIMES = 'workingtimes', KEY_PRIVATE_TOKEN = 'private_token', KEY_GITLAB_DOMAIN = 'gitlab_domain', KEY_GITLAB_PROJECT_ID = 'gitlab_project_id';
+var KEY_SELECT_ISSUE_ID = 'select_issue_id', KEY_START_DATE = 'start_date', KEY_WORKINGTIMES = 'workingtimes', KEY_ISSUE_LIST = 'issue_list', KEY_PRIVATE_TOKEN = 'private_token', KEY_GITLAB_DOMAIN = 'gitlab_domain', KEY_GITLAB_PROJECT_ID = 'gitlab_project_id', KEY_IS_OUTPUT_JSON_WHEN_SPENT = 'is_output_json_when_spent';
 /**------------------------------------- NICE TO HAVE ----------------------------------- //
  *
  * Vue.jsにしたいよね
  * 閉じて開いたら選択している付箋はelapsedとtoday更新されていてほしい
  * 付箋並び替えたい（人順とか）
- * なんか初期表示までが遅い。非同期で初期表示に使う情報を取得したい
- * マイルストーンとか実績とか前回のキャッシュ利用したい
  * プロフ写真ローカルに保存したい。取得できなくなってたら取り直すとかもしたい
  * ディレクトリ構造を考えて配置したい
+ * ローカルストレージの付箋情報は最新化しておきたい
+ * getIssueAjaxをprefetchしたい（=callbackではなくPromiseで制御すれば実現できる）
+ * json実績のバックアップを取りたい
  *
  */
 // --------------------------------------- 状態一覧 --------------------------------------- //
@@ -1976,11 +1988,11 @@ var startDate;
 var workingTimeList;
 // 内部的に持ってるイシューリスト
 var issueList;
+// spent時にJSON出力するか
+var isOutputJsonWhenSpent = true;
 // ------------------------------------ 画面項目一覧 ------------------------------------ //
 // Spendボタン
 var spendButton;
-// マイルスト―ンラベル
-var milestoneLabel;
 // 合計消費時間を示すdiv要素
 var totalElapsedTime;
 // 付箋一覧
@@ -1991,25 +2003,58 @@ var workingTimeStickyList;
 var localStorageClient;
 var gitLabApiClient;
 // ------------------------------------- 処理内容 ---------------------------------------- //
+localStorageClient = new _domain_localStorageWindow__WEBPACK_IMPORTED_MODULE_10__.LocalStorageWindow(); //LocalStorageChrome()
+var logined = loginCheck();
 document.addEventListener("DOMContentLoaded", function () {
     return __awaiter(this, void 0, void 0, function () {
-        var isLogined;
+        var fetch_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    localStorageClient = new _domain_localStorageWindow__WEBPACK_IMPORTED_MODULE_12__.LocalStorageWindow(); //LocalStorageChrome()
-                    return [4 /*yield*/, loginCheck()];
+                case 0: return [4 /*yield*/, logined];
                 case 1:
-                    isLogined = _a.sent();
-                    if (isLogined) {
-                        gitLabApiClient = new _domain_gitlab_gitLabApi__WEBPACK_IMPORTED_MODULE_6__.GitLabApi(new _domain_gitlab_gitLabProjcetAccessTokens__WEBPACK_IMPORTED_MODULE_5__.GitLabProjectAccessTokens(PRIVATE_TOKEN, GITLAB_DOMAIN, PROJECT_ID));
-                        preFetchAjax();
-                        initialize();
-                    }
-                    else {
-                        window.location.href = './setting.html';
-                    }
-                    return [2 /*return*/];
+                    if (!_a.sent()) return [3 /*break*/, 4];
+                    fetch_1 = preFetchAjax();
+                    return [4 /*yield*/, initialize()];
+                case 2:
+                    _a.sent();
+                    return [4 /*yield*/, fetch_1
+                        // gitlabに新しい付箋をfetchして追加
+                    ];
+                case 3:
+                    _a.sent();
+                    // gitlabに新しい付箋をfetchして追加
+                    gitLabApiClient.getAjaxIssue(function (rslt) {
+                        var tempIssues = [];
+                        rslt.forEach(function (issue) {
+                            tempIssues.push(new _domain_gitlab_gitLabIssue__WEBPACK_IMPORTED_MODULE_7__.GitLabIssue(issue));
+                        });
+                        var tempIssueList = new _domain_issueList__WEBPACK_IMPORTED_MODULE_8__.IssueList();
+                        tempIssueList.set(tempIssues);
+                        var filterParam = new _domain_issueParam__WEBPACK_IMPORTED_MODULE_9__.IssueParam();
+                        if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_14__.isDefined)(loginUser) && (0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_14__.isDefined)(loginUser.getId())) {
+                            filterParam.setUserId(loginUser.getId());
+                        }
+                        filterParam.setActive(true);
+                        filterParam.setLabel('Doing');
+                        var issueIds = issueList.getAllIds();
+                        tempIssueList.filter(filterParam).getIssueList().forEach(function (issue) {
+                            // ローカルストレージにある付箋の場合
+                            if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_14__.isDefined)(issueIds.find(function (id) { return id == issue.id; }))) {
+                                // FIXME: 付箋情報の更新
+                            }
+                            else {
+                                // ローカルストレージにない、新しい付箋の場合
+                                issueList.add(issue);
+                                stickyNoteList.add(issue, true);
+                            }
+                        });
+                        localStorageClient.setObject(KEY_ISSUE_LIST, issueList.getIssueList());
+                    }, 100, 1);
+                    return [3 /*break*/, 5];
+                case 4:
+                    window.location.href = './setting.html';
+                    _a.label = 5;
+                case 5: return [2 /*return*/];
             }
         });
     });
@@ -2032,11 +2077,16 @@ function loginCheck() {
                     return [4 /*yield*/, localStorageClient.getObject(KEY_GITLAB_PROJECT_ID)];
                 case 3:
                     gitLabProjectId = _a.sent();
-                    isLogin = (0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_16__.isDefined)(privateToken) && (0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_16__.isDefined)(gitLabDomain) && (0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_16__.isDefined)(gitLabProjectId);
+                    isLogin = (0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_14__.isDefined)(privateToken) && (0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_14__.isDefined)(gitLabDomain) && (0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_14__.isDefined)(gitLabProjectId);
+                    return [4 /*yield*/, localStorageClient.getObject(KEY_IS_OUTPUT_JSON_WHEN_SPENT)];
+                case 4:
+                    // 設定フラグ
+                    isOutputJsonWhenSpent = (_a.sent()) == true;
                     if (isLogin) {
                         PRIVATE_TOKEN = privateToken;
                         GITLAB_DOMAIN = gitLabDomain;
                         PROJECT_ID = gitLabProjectId;
+                        gitLabApiClient = new _domain_gitlab_gitLabApi__WEBPACK_IMPORTED_MODULE_5__.GitLabApi(new _domain_gitlab_gitLabProjcetAccessTokens__WEBPACK_IMPORTED_MODULE_4__.GitLabProjectAccessTokens(PRIVATE_TOKEN, GITLAB_DOMAIN, PROJECT_ID));
                         return [2 /*return*/, true];
                     }
                     else {
@@ -2054,14 +2104,20 @@ function loginCheck() {
 function preFetchAjax() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
-            // ログインユーザーを取得
-            gitLabApiClient.getLoginUser(function (rslt) {
-                // 画面アイコンに適用
-                loginUser = new _domain_gitlab_gitlabUser__WEBPACK_IMPORTED_MODULE_8__.GitLabUser(rslt);
-                var avatarElement = document.querySelector('.profile-avatar'); // Nullチェック
-                avatarElement.setAttribute('src', loginUser.getImgPath());
-            });
-            return [2 /*return*/];
+            switch (_a.label) {
+                case 0: 
+                // ログインユーザーを取得
+                return [4 /*yield*/, gitLabApiClient.getLoginUser(function (rslt) {
+                        // 画面アイコンに適用
+                        loginUser = new _domain_gitlab_gitLabUser__WEBPACK_IMPORTED_MODULE_6__.GitLabUser(rslt);
+                        var avatarElement = document.querySelector('.profile-avatar'); // Nullチェック
+                        avatarElement.setAttribute('src', loginUser.getImgPath());
+                    })];
+                case 1:
+                    // ログインユーザーを取得
+                    _a.sent();
+                    return [2 /*return*/];
+            }
         });
     });
 }
@@ -2070,55 +2126,30 @@ function preFetchAjax() {
  */
 function initialize() {
     return __awaiter(this, void 0, void 0, function () {
-        var lastMileStone, temp_issueList, filterParam;
+        var savedIssueList, gitLabIssue_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     // 画面操作用にオブジェクト生成
-                    spendButton = new _domain_html_spendButton__WEBPACK_IMPORTED_MODULE_1__.SpendButton(new _domain_element_elementId__WEBPACK_IMPORTED_MODULE_3__.ElementId('spend-button'));
-                    milestoneLabel = new _domain_html_milestoneLabel__WEBPACK_IMPORTED_MODULE_2__.MilestoneLabel(new _domain_element_elementClass__WEBPACK_IMPORTED_MODULE_4__.ElementClass('milestone-label'));
-                    totalElapsedTime = new _domain_html_totalElapsedTime__WEBPACK_IMPORTED_MODULE_0__.TotalElapsedTime(new _domain_element_elementClass__WEBPACK_IMPORTED_MODULE_4__.ElementClass('total-elapsedTime'));
-                    stickyNoteList = new _domain_stickyNoteList__WEBPACK_IMPORTED_MODULE_15__.StickyNoteList(new _domain_element_elementId__WEBPACK_IMPORTED_MODULE_3__.ElementId('issue-list'));
-                    workingTimeList = new _domain_workingTimeList__WEBPACK_IMPORTED_MODULE_14__.WorkingTimeList();
-                    workingTimeStickyList = new _domain_WorkingTimeStickyList__WEBPACK_IMPORTED_MODULE_17__.WorkingTimeStickyList(new _domain_element_elementId__WEBPACK_IMPORTED_MODULE_3__.ElementId('workingTime-sticky-list'));
-                    issueList = new _domain_issueList__WEBPACK_IMPORTED_MODULE_10__.IssueList();
-                    lastMileStone = gitLabApiClient.getAjaxMilestone(function (rslt) {
-                        // 最新のマイルストーンを画面要素へセット
-                        milestoneLabel.setMilestone(new _domain_gitlab_gitLabMilestone__WEBPACK_IMPORTED_MODULE_7__.GitLabMilestone(rslt[0]));
-                    });
-                    return [4 /*yield*/, lastMileStone];
+                    spendButton = new _domain_html_spendButton__WEBPACK_IMPORTED_MODULE_1__.SpendButton(new _domain_element_elementId__WEBPACK_IMPORTED_MODULE_2__.ElementId('spend-button'));
+                    totalElapsedTime = new _domain_html_totalElapsedTime__WEBPACK_IMPORTED_MODULE_0__.TotalElapsedTime(new _domain_element_elementClass__WEBPACK_IMPORTED_MODULE_3__.ElementClass('total-elapsedTime'));
+                    stickyNoteList = new _domain_stickyNoteList__WEBPACK_IMPORTED_MODULE_13__.StickyNoteList(new _domain_element_elementId__WEBPACK_IMPORTED_MODULE_2__.ElementId('issue-list'));
+                    workingTimeList = new _domain_workingTimeList__WEBPACK_IMPORTED_MODULE_12__.WorkingTimeList();
+                    workingTimeStickyList = new _domain_workingTimeStickyList__WEBPACK_IMPORTED_MODULE_15__.WorkingTimeStickyList(new _domain_element_elementId__WEBPACK_IMPORTED_MODULE_2__.ElementId('workingTime-sticky-list'));
+                    issueList = new _domain_issueList__WEBPACK_IMPORTED_MODULE_8__.IssueList();
+                    return [4 /*yield*/, localStorageClient.getObject(KEY_ISSUE_LIST)];
                 case 1:
-                    _a.sent();
-                    temp_issueList = [];
-                    if (!(0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_16__.isDefined)(milestoneLabel.getMilestone())) return [3 /*break*/, 4];
-                    return [4 /*yield*/, gitLabApiClient.getAjaxIssue(function (rslt) {
-                            rslt.forEach(function (issue) {
-                                temp_issueList.push(new _domain_gitlab_gitLabIssue__WEBPACK_IMPORTED_MODULE_9__.GitLabIssue(issue));
-                            });
-                        }, milestoneLabel.getMilestone(), 1)];
-                case 2:
-                    _a.sent();
-                    return [4 /*yield*/, gitLabApiClient.getAjaxIssue(function (rslt) {
-                            rslt.forEach(function (issue) {
-                                temp_issueList.push(new _domain_gitlab_gitLabIssue__WEBPACK_IMPORTED_MODULE_9__.GitLabIssue(issue));
-                            });
-                        }, milestoneLabel.getMilestone(), 2)];
-                case 3:
-                    _a.sent();
-                    issueList.set(temp_issueList);
-                    _a.label = 4;
-                case 4:
-                    filterParam = new _domain_issueParam__WEBPACK_IMPORTED_MODULE_11__.IssueParam();
-                    if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_16__.isDefined)(loginUser.getId())) {
-                        filterParam.setUserId(loginUser.getId());
+                    savedIssueList = _a.sent();
+                    if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_14__.isDefined)(savedIssueList) && savedIssueList.length > 0) {
+                        gitLabIssue_1 = [];
+                        savedIssueList.forEach(function (iissue) {
+                            gitLabIssue_1.push(new _domain_issueDto__WEBPACK_IMPORTED_MODULE_16__.IssueDto(iissue));
+                        });
+                        issueList.set(gitLabIssue_1);
+                        stickyNoteList.set(issueList);
                     }
-                    filterParam.setActive(true);
-                    filterParam.setLabel('Doing');
-                    stickyNoteList.set(issueList.filter(filterParam));
                     setEventListener();
-                    return [4 /*yield*/, revertToBeforeState()];
-                case 5:
-                    _a.sent();
+                    revertToBeforeState();
                     return [2 /*return*/];
             }
         });
@@ -2129,7 +2160,7 @@ function initialize() {
  */
 function revertToBeforeState() {
     return __awaiter(this, void 0, void 0, function () {
-        var workingTimes, te, selectIssueIndex;
+        var workingTimes, selectIssueIndex;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, localStorageClient.getObject(KEY_SELECT_ISSUE_ID)];
@@ -2141,46 +2172,23 @@ function revertToBeforeState() {
                     return [4 /*yield*/, localStorageClient.getObject(KEY_WORKINGTIMES)];
                 case 3:
                     workingTimes = _a.sent();
-                    if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_16__.isDefined)(workingTimes) && workingTimes.length > 0) {
+                    if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_14__.isDefined)(workingTimes) && workingTimes.length > 0) {
                         workingTimes.forEach(function (workingTimeObj) {
                             // 内部的な実績に反映
-                            var workingTime = new _domain_workingTime__WEBPACK_IMPORTED_MODULE_13__.WorkingTime(workingTimeObj.startDate, workingTimeObj.elapsedTime, workingTimeObj.taskId, workingTimeObj.taskName);
+                            var workingTime = new _domain_workingTime__WEBPACK_IMPORTED_MODULE_11__.WorkingTime(workingTimeObj.startDate, workingTimeObj.elapsedTime, workingTimeObj.taskId, workingTimeObj.taskName);
                             workingTimeList.add(workingTime);
-                        });
-                        // 以前実績を入れたイシューがDoingから変わった場合は手動で追加(Deleteされていたらもちろん拾えない)
-                        workingTimeList.getListGroupById().forEach(function (workingTime) {
-                            var wasteIssueId = workingTime.getTaskId();
-                            if (!stickyNoteList.existById(wasteIssueId)) {
-                                if (issueList.getById(wasteIssueId)) { //FIXME: 存在チェックダサいのでうまいこと出来ないか（そもそもissueListにも無い状況ってDeleteされてるくらい？）
-                                    var issue = issueList.getById(wasteIssueId);
-                                    if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_16__.isDefined)(issue)) {
-                                        stickyNoteList.add(issue);
-                                    }
-                                }
-                            }
                         });
                         // 見た目に反映
                         stickyNoteList.update(workingTimeList.getListGroupById());
                         totalElapsedTime.set(workingTimeList.getElapsedTime());
                         workingTimeStickyList.set(workingTimeList);
                     }
-                    // 以前選択していたイシューが消えた（裏でcloseされている等）場合は手動で追加
-                    if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_16__.isDefined)(selectIssueId)) {
-                        if (!stickyNoteList.existById(selectIssueId)) {
-                            if (issueList.getById(selectIssueId)) { //FIXME: 存在チェックダサいのでry
-                                te = issueList.getById(selectIssueId);
-                                if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_16__.isDefined)(te)) {
-                                    stickyNoteList.add(te);
-                                }
-                            }
-                        }
-                        selectIssueIndex = stickyNoteList.getIndexById(selectIssueId);
-                        // 選択してるイシューがリストにあれば
-                        if (selectIssueIndex != -1) {
-                            // 選択する
-                            if (startDate) {
-                                stickyNoteList.selectByIndex(selectIssueIndex, startDate);
-                            }
+                    selectIssueIndex = stickyNoteList.getIndexById(selectIssueId);
+                    // 選択してるイシューがリストにあれば
+                    if (selectIssueIndex != -1) {
+                        // 選択する
+                        if (startDate) {
+                            stickyNoteList.selectByIndex(selectIssueIndex, startDate);
                         }
                     }
                     return [2 /*return*/];
@@ -2204,6 +2212,7 @@ function setEventListener() {
             workingTimeList.clear();
             totalElapsedTime.set(0);
             localStorageClient.setObject(KEY_WORKINGTIMES, {});
+            localStorageClient.setObject(KEY_ISSUE_LIST, {});
         }
     });
     // 付箋選択時のイベントハンドラを設定
@@ -2212,9 +2221,9 @@ function setEventListener() {
         // 選択された付箋が選択状態であれば
         if (stickyNote.isAvailable()) {
             // 前に選択されていたタスクの実績を記録する
-            if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_16__.isDefined)(selectIssueId)) {
+            if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_14__.isDefined)(selectIssueId)) {
                 var beforeStickyNote = stickyNoteList.getById(selectIssueId);
-                var workingTime = new _domain_workingTime__WEBPACK_IMPORTED_MODULE_13__.WorkingTime(beforeStickyNote.getStartDate(), endDate - beforeStickyNote.getStartDate(), beforeStickyNote.getId(), beforeStickyNote.getName());
+                var workingTime = new _domain_workingTime__WEBPACK_IMPORTED_MODULE_11__.WorkingTime(beforeStickyNote.getStartDate(), endDate - beforeStickyNote.getStartDate(), beforeStickyNote.getId(), beforeStickyNote.getName());
                 workingTimeList.add(workingTime);
             }
             // 選択された付箋IDを状態変数に保持
@@ -2226,7 +2235,7 @@ function setEventListener() {
         }
         else {
             // 選択を外されたタスクの実績を記録する
-            var workingTime = new _domain_workingTime__WEBPACK_IMPORTED_MODULE_13__.WorkingTime(stickyNote.getStartDate(), endDate - stickyNote.getStartDate(), stickyNote.getId(), stickyNote.getName());
+            var workingTime = new _domain_workingTime__WEBPACK_IMPORTED_MODULE_11__.WorkingTime(stickyNote.getStartDate(), endDate - stickyNote.getStartDate(), stickyNote.getId(), stickyNote.getName());
             workingTimeList.add(workingTime);
             // 状態変数を初期化
             selectIssueId = undefined;

@@ -1,5 +1,5 @@
 import { IIssue } from "../iIssue"
-import { GitLabUser } from "./gitlabUser"
+import { GitLabUser } from "./gitLabUser"
 import { isDefined } from "../../function/nullCheck"
 
 // Issue単体のクラス
