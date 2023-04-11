@@ -36,7 +36,7 @@ const KEY_SELECT_ISSUE_ID = 'select_issue_id'
 	, KEY_PRIVATE_TOKEN = 'private_token'
 	, KEY_GITLAB_DOMAIN = 'gitlab_domain'
 	, KEY_GITLAB_PROJECT_ID = 'gitlab_project_id'
-	, KEY_IS_OUTPUT_JSON_WHEN_SPENT = 'is_output_json_when_spent'
+	// , KEY_IS_OUTPUT_JSON_WHEN_SPENT = 'is_output_json_when_spent'
 
 /**------------------------------------- NICE TO HAVE ----------------------------------- //
  * 
@@ -60,7 +60,7 @@ let workingTimeList: WorkingTimeList
 // 内部的に持ってるイシューリスト
 let issueList: IssueList
 // spent時にJSON出力するか
-let isOutputJsonWhenSpent = true
+// let isOutputJsonWhenSpent = true
 
 // ------------------------------------ 画面項目一覧 ------------------------------------ //
 // Spendボタン
@@ -127,8 +127,8 @@ async function loginCheck(){
 	const gitLabDomain = await localStorageClient.getObject(KEY_GITLAB_DOMAIN)
 	const gitLabProjectId = await localStorageClient.getObject(KEY_GITLAB_PROJECT_ID)
 	const isLogin = isDefined(privateToken) && isDefined(gitLabDomain) && isDefined(gitLabProjectId)
-	// 設定フラグ
-	isOutputJsonWhenSpent = await localStorageClient.getObject(KEY_IS_OUTPUT_JSON_WHEN_SPENT) == true
+	// // 設定フラグ
+	// isOutputJsonWhenSpent = await localStorageClient.getObject(KEY_IS_OUTPUT_JSON_WHEN_SPENT) == true
 	if(isLogin){
 		PRIVATE_TOKEN = privateToken
 		GITLAB_DOMAIN = gitLabDomain
@@ -229,8 +229,11 @@ function setEventListener(){
 			stickyNoteList.clearAll()
 			workingTimeList.clear()
 			totalElapsedTime.set(0)
-			localStorageClient.setObject(KEY_WORKINGTIMES, {})
-			localStorageClient.setObject(KEY_ISSUE_LIST, {})
+			localStorageClient.deleteObject(KEY_WORKINGTIMES)
+			localStorageClient.deleteObject(KEY_ISSUE_LIST)
+			localStorageClient.deleteObject(KEY_SELECT_ISSUE_ID)
+			localStorageClient.deleteObject(KEY_START_DATE)
+			iconBadgeToggle(false)
 		}
 	})
 
@@ -269,12 +272,8 @@ function setEventListener(){
 		const saveWorkingTimes = workingTimeList.getAll()
 		localStorageClient.setObject(KEY_WORKINGTIMES, saveWorkingTimes)
 
-		// 付箋の選択状態に応じてアイコンのバッジをON/OFFさせる
-		const text = stickyNote.isAvailable()? "▶️" : "■"
-        , color = stickyNote.isAvailable()? "#00CC66" : "#FF0000"
-		chrome.action.setBadgeText({"text" : text})
-		chrome.action.setBadgeBackgroundColor({"color" : color})
-		chrome.action.setBadgeTextColor({"color" : "#FFFFFF"})
+		// 付箋の選択状態に応じてアイコンのバッジを切り替える
+		iconBadgeToggle(stickyNote.isAvailable())
 	})
 	
 	// 付箋リスト変更時のイベントハンドラを設定
@@ -289,4 +288,15 @@ function setEventListener(){
 		const jsonText = JSON.stringify(workingTimeList.getAll())
 		navigator.clipboard.writeText(jsonText).then(()=>alert('クリップボードにコピーしました。')).catch(e=>alert('コピー時にエラー！ '+e.message));
 	})
+}
+
+/**
+ * アイコンのバッジをON/OFFさせる
+ */
+function iconBadgeToggle(isStart: boolean){
+	const text = isStart? "▶️" : "■"
+	, color = isStart? "#00CC66" : "#FF0000"
+	chrome.action.setBadgeText({"text" : text})
+	chrome.action.setBadgeBackgroundColor({"color" : color})
+	chrome.action.setBadgeTextColor({"color" : "#FFFFFF"})
 }
