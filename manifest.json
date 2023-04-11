@@ -1,7 +1,7 @@
 {
   "name": "GitLab Time Tracker",
   "description": "シンプルで使いやすいタイムトラッカー",
-  "version": "1.0",
+  "version": "1.4",
   "manifest_version": 3,
   "permissions": [
     "storage"

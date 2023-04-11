@@ -2248,6 +2248,11 @@ function setEventListener() {
         totalElapsedTime.set(workingTimeList.getElapsedTime());
         var saveWorkingTimes = workingTimeList.getAll();
         localStorageClient.setObject(KEY_WORKINGTIMES, saveWorkingTimes);
+        // 付箋の選択状態に応じてアイコンのバッジをON/OFFさせる
+        var text = stickyNote.isAvailable() ? "▶️" : "■", color = stickyNote.isAvailable() ? "#00CC66" : "#FF0000";
+        chrome.action.setBadgeText({ "text": text });
+        chrome.action.setBadgeBackgroundColor({ "color": color });
+        chrome.action.setBadgeTextColor({ "color": "#FFFFFF" });
     });
     // 付箋リスト変更時のイベントハンドラを設定
     workingTimeStickyList.addListenerChangeAfter(function () {
