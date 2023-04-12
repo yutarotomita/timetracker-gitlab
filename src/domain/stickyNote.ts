@@ -55,8 +55,8 @@ export class StickyNote{
 			badgeDom.classList.add(Bootstrap5.CLASS_BG_DARK())
 		}
 		else{
-			badgeDom.innerHTML = issue.getLabels()[0] //FIXME: 複数ラベルに対応したい
-			if(issue.getLabels()[0] == 'Doing'){
+			badgeDom.innerHTML = issue.getLabels()[0] //FIXME: 複数ラベルに対応したい。にも対応したい
+			if(issue.getLabels()[0] == 'Doing'){ //FIXME: ラベル名と付箋の色をベタ書き対応やめたい
 				badgeDom.classList.add(Bootstrap5.CLASS_BG_SUCCESS())
 			}
 			else if(issue.getLabels()[0] == 'Waiting'){
