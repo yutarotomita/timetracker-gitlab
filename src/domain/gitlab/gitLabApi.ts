@@ -1,7 +1,6 @@
-import { IMilestone } from "../iMilestone"
 import { GitLabProjectAccessTokens } from "./gitLabProjcetAccessTokens"
 import { Time } from "../common/time"
-import { isUndefined } from "../../function/nullCheck"
+import { IIssue } from "../iIssue"
 
 export class GitLabApi{
     private privateToken :string
@@ -22,7 +21,7 @@ export class GitLabApi{
 	async getLoginUser(callback: Function){
 		let url = this.createBaseUrl()
 		url.pathname = url.pathname + '/user/'
-		await this.getAjax(url, callback)
+		await this.getAjaxCallback(url, callback)
 	}
 
 	/**
@@ -44,7 +43,18 @@ export class GitLabApi{
 		let url = this.createBaseUrl()
 		url.pathname = url.pathname + '/projects/' + this.getProjectId() + '/issues'
 		url.search = '?per_page=' + perPage + '&page=' + page
-		await this.getAjax(url, callback)
+		await this.getAjaxCallback(url, callback)
+	}
+
+	/**
+	 * GET /projects/:id/issues
+	 * @param {*} max
+	 */
+	async getIssueByMax(perPage: number, page: number): Promise<Array<IIssue>>{
+		let url = this.createBaseUrl()
+		url.pathname = url.pathname + '/projects/' + this.getProjectId() + '/issues'
+		url.search = '?per_page=' + perPage + '&page=' + page
+		return this.getAjax(url)
 	}
 
 	/**
@@ -52,9 +62,29 @@ export class GitLabApi{
 	 * @param {*} url 
 	 * @param {*} callback 
 	 */
-	async getAjax(url: URL, callback: Function){
+	async getAjax(url: URL){
 		console.log('GET AjaxStart: ' + url)
-		await fetch(url.toString(), {
+		const response = await fetch(url.toString(), {
+			method: 'GET',
+			mode: 'cors',
+			headers: {
+			  'Content-Type': 'application/json',
+			  'PRIVATE-TOKEN': this.privateToken
+			},
+		  })
+		console.log('GET AjaxEnd: ' + url)
+		const rslt = response.json()
+		return response.ok? Promise.resolve(rslt) : Promise.reject(rslt)
+	}
+
+	/**
+	 * getAjaxに移管していきたい
+	 * @param {*} url 
+	 * @param {*} callback 
+	 */
+	getAjaxCallback(url: URL, callback: Function){
+		console.log('GET AjaxStart: ' + url)
+		fetch(url.toString(), {
 			method: 'GET',
 			mode: 'cors',
 			headers: {

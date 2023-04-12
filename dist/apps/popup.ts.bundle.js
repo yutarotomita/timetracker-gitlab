@@ -278,7 +278,7 @@ var GitLabApi = /** @class */ (function () {
                     case 0:
                         url = this.createBaseUrl();
                         url.pathname = url.pathname + '/user/';
-                        return [4 /*yield*/, this.getAjax(url, callback)];
+                        return [4 /*yield*/, this.getAjaxCallback(url, callback)];
                     case 1:
                         _a.sent();
                         return [2 /*return*/];
@@ -309,7 +309,7 @@ var GitLabApi = /** @class */ (function () {
                         url = this.createBaseUrl();
                         url.pathname = url.pathname + '/projects/' + this.getProjectId() + '/issues';
                         url.search = '?per_page=' + perPage + '&page=' + page;
-                        return [4 /*yield*/, this.getAjax(url, callback)];
+                        return [4 /*yield*/, this.getAjaxCallback(url, callback)];
                     case 1:
                         _a.sent();
                         return [2 /*return*/];
@@ -318,12 +318,28 @@ var GitLabApi = /** @class */ (function () {
         });
     };
     /**
+     * GET /projects/:id/issues
+     * @param {*} max
+     */
+    GitLabApi.prototype.getIssueByMax = function (perPage, page) {
+        return __awaiter(this, void 0, void 0, function () {
+            var url;
+            return __generator(this, function (_a) {
+                url = this.createBaseUrl();
+                url.pathname = url.pathname + '/projects/' + this.getProjectId() + '/issues';
+                url.search = '?per_page=' + perPage + '&page=' + page;
+                return [2 /*return*/, this.getAjax(url)];
+            });
+        });
+    };
+    /**
      *
      * @param {*} url
      * @param {*} callback
      */
-    GitLabApi.prototype.getAjax = function (url, callback) {
+    GitLabApi.prototype.getAjax = function (url) {
         return __awaiter(this, void 0, void 0, function () {
+            var response, rslt;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -335,26 +351,44 @@ var GitLabApi = /** @class */ (function () {
                                     'Content-Type': 'application/json',
                                     'PRIVATE-TOKEN': this.privateToken
                                 },
-                            })
-                                .then(function (response) {
-                                if (!response.ok) {
-                                    throw new Error('下記のリクエストに失敗しているので、メッセージをご確認ください');
-                                }
-                                return response.json();
-                            })
-                                .then(function (rslt) {
-                                callback(rslt);
-                            })
-                                .catch(function (error) {
-                                console.error(error);
                             })];
                     case 1:
-                        _a.sent();
+                        response = _a.sent();
                         console.log('GET AjaxEnd: ' + url);
-                        return [2 /*return*/];
+                        rslt = response.json();
+                        return [2 /*return*/, response.ok ? Promise.resolve(rslt) : Promise.reject(rslt)];
                 }
             });
         });
+    };
+    /**
+     * getAjaxに移管していきたい
+     * @param {*} url
+     * @param {*} callback
+     */
+    GitLabApi.prototype.getAjaxCallback = function (url, callback) {
+        console.log('GET AjaxStart: ' + url);
+        fetch(url.toString(), {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json',
+                'PRIVATE-TOKEN': this.privateToken
+            },
+        })
+            .then(function (response) {
+            if (!response.ok) {
+                throw new Error('下記のリクエストに失敗しているので、メッセージをご確認ください');
+            }
+            return response.json();
+        })
+            .then(function (rslt) {
+            callback(rslt);
+        })
+            .catch(function (error) {
+            console.error(error);
+        });
+        console.log('GET AjaxEnd: ' + url);
     };
     /**
      * POST /projects/:id/issues/:issue_iid/add_spent_time
@@ -1119,8 +1153,8 @@ var StickyNote = /** @class */ (function () {
             progressPer2 = Math.floor((addTime / estimatedTime) * 100);
         }
         else if (spendTime + addTime > 0) {
-            progressPer1 = Math.floor(spendTime / (spendTime + addTime)) * 100;
-            progressPer2 = Math.floor(addTime / (spendTime + addTime)) * 100;
+            progressPer1 = Math.floor((spendTime / (spendTime + addTime)) * 100);
+            progressPer2 = 100 - progressPer1;
         }
         else {
             progressPer1 = 0;
@@ -1141,7 +1175,7 @@ var StickyNote = /** @class */ (function () {
             progressBarDom1.classList.add(_boostrap5__WEBPACK_IMPORTED_MODULE_3__.Bootstrap5.CLASS_BG_DANGER());
             progressBarDom2.classList.add(_boostrap5__WEBPACK_IMPORTED_MODULE_3__.Bootstrap5.CLASS_BG_DANGER());
         }
-        else if (progressPer1 + progressPer2 > 100) {
+        else if (progressPer1 + progressPer2 > 110) {
             progressBarDom1.classList.add(_boostrap5__WEBPACK_IMPORTED_MODULE_3__.Bootstrap5.CLASS_BG_WARNING());
             progressBarDom2.classList.add(_boostrap5__WEBPACK_IMPORTED_MODULE_3__.Bootstrap5.CLASS_BG_WARNING());
         }
@@ -1977,7 +2011,6 @@ var KEY_SELECT_ISSUE_ID = 'select_issue_id', KEY_START_DATE = 'start_date', KEY_
  * プロフ写真ローカルに保存したい。取得できなくなってたら取り直すとかもしたい
  * ディレクトリ構造を考えて配置したい
  * ローカルストレージの付箋情報は最新化しておきたい
- * getIssueAjaxをprefetchしたい（=callbackではなくPromiseで制御すれば実現できる）
  * json実績のバックアップを取りたい
  *
  */
@@ -1991,6 +2024,8 @@ var workingTimeList;
 var issueList;
 // spent時にJSON出力するか
 // let isOutputJsonWhenSpent = true
+// GitLabから取得した最新のissueたち。prefech処理で格納される
+var issuesFetch;
 // ------------------------------------ 画面項目一覧 ------------------------------------ //
 // Spendボタン
 var spendButton;
@@ -2015,42 +2050,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 case 1:
                     if (!_a.sent()) return [3 /*break*/, 4];
                     fetch_1 = preFetchAjax();
+                    // 初期表示
                     return [4 /*yield*/, initialize()];
                 case 2:
+                    // 初期表示
                     _a.sent();
                     return [4 /*yield*/, fetch_1
-                        // gitlabに新しい付箋をfetchして追加
+                        // 取得したissueを元に新しい付箋を追加・更新
                     ];
                 case 3:
                     _a.sent();
-                    // gitlabに新しい付箋をfetchして追加
-                    gitLabApiClient.getAjaxIssue(function (rslt) {
-                        var tempIssues = [];
-                        rslt.forEach(function (issue) {
-                            tempIssues.push(new _domain_gitlab_gitLabIssue__WEBPACK_IMPORTED_MODULE_7__.GitLabIssue(issue));
-                        });
-                        var tempIssueList = new _domain_issueList__WEBPACK_IMPORTED_MODULE_8__.IssueList();
-                        tempIssueList.set(tempIssues);
-                        var filterParam = new _domain_issueParam__WEBPACK_IMPORTED_MODULE_9__.IssueParam();
-                        if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_14__.isDefined)(loginUser) && (0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_14__.isDefined)(loginUser.getId())) {
-                            filterParam.setUserId(loginUser.getId());
-                        }
-                        filterParam.setActive(true);
-                        filterParam.setLabel('Doing');
-                        var issueIds = issueList.getAllIds();
-                        tempIssueList.filter(filterParam).getIssueList().forEach(function (issue) {
-                            // ローカルストレージにある付箋の場合
-                            if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_14__.isDefined)(issueIds.find(function (id) { return id == issue.id; }))) {
-                                // FIXME: 付箋情報の更新
-                            }
-                            else {
-                                // ローカルストレージにない、新しい付箋の場合
-                                issueList.add(issue);
-                                stickyNoteList.add(issue, true);
-                            }
-                        });
-                        localStorageClient.setObject(KEY_ISSUE_LIST, issueList.getIssueList());
-                    }, 100, 1);
+                    // 取得したissueを元に新しい付箋を追加・更新
+                    addStickeyNotes(issuesFetch);
                     return [3 /*break*/, 5];
                 case 4:
                     window.location.href = './setting.html';
@@ -2102,8 +2113,9 @@ function loginCheck() {
  */
 function preFetchAjax() {
     return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var issuesPage1, issuesPage2, issuesPage3, _a, _b, _c, _d;
+        return __generator(this, function (_e) {
+            switch (_e.label) {
                 case 0: 
                 // ログインユーザーを取得
                 return [4 /*yield*/, gitLabApiClient.getLoginUser(function (rslt) {
@@ -2111,11 +2123,23 @@ function preFetchAjax() {
                         loginUser = new _domain_gitlab_gitLabUser__WEBPACK_IMPORTED_MODULE_6__.GitLabUser(rslt);
                         var avatarElement = document.querySelector('.profile-avatar'); // Nullチェック
                         avatarElement.setAttribute('src', loginUser.getImgPath());
-                    })];
+                    })
+                    // issueを最新300コまで取得
+                ];
                 case 1:
                     // ログインユーザーを取得
-                    _a.sent();
-                    return [2 /*return*/];
+                    _e.sent();
+                    issuesPage1 = gitLabApiClient.getIssueByMax(100, 1), issuesPage2 = gitLabApiClient.getIssueByMax(100, 2), issuesPage3 = gitLabApiClient.getIssueByMax(100, 3);
+                    return [4 /*yield*/, issuesPage1];
+                case 2:
+                    _c = (_b = (_e.sent())).concat;
+                    return [4 /*yield*/, issuesPage2];
+                case 3:
+                    _d = (_a = _c.apply(_b, [_e.sent()])).concat;
+                    return [4 /*yield*/, issuesPage3];
+                case 4:
+                    issuesFetch = _d.apply(_a, [_e.sent()]);
+                    return [2 /*return*/, Promise.resolve()];
             }
         });
     });
@@ -2273,6 +2297,37 @@ function iconBadgeToggle(isStart) {
     chrome.action.setBadgeText({ "text": text });
     chrome.action.setBadgeBackgroundColor({ "color": color });
     chrome.action.setBadgeTextColor({ "color": "#FFFFFF" });
+}
+/**
+ * issueを付箋に追加する。既に付箋があるissueの場合は情報を更新する
+ * @param issues
+ */
+function addStickeyNotes(issues) {
+    var tempIssues = [];
+    issues.forEach(function (issue) {
+        tempIssues.push(new _domain_gitlab_gitLabIssue__WEBPACK_IMPORTED_MODULE_7__.GitLabIssue(issue));
+    });
+    var tempIssueList = new _domain_issueList__WEBPACK_IMPORTED_MODULE_8__.IssueList();
+    tempIssueList.set(tempIssues);
+    var filterParam = new _domain_issueParam__WEBPACK_IMPORTED_MODULE_9__.IssueParam();
+    if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_14__.isDefined)(loginUser) && (0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_14__.isDefined)(loginUser.getId())) {
+        filterParam.setUserId(loginUser.getId());
+    }
+    filterParam.setActive(true);
+    filterParam.setLabel('Doing');
+    var issueIds = issueList.getAllIds();
+    tempIssueList.filter(filterParam).getIssueList().forEach(function (issue) {
+        // ローカルストレージにある付箋の場合
+        if ((0,_function_nullCheck__WEBPACK_IMPORTED_MODULE_14__.isDefined)(issueIds.find(function (id) { return id == issue.id; }))) {
+            // FIXME: 付箋情報の更新
+        }
+        else {
+            // ローカルストレージにない、新しい付箋の場合
+            issueList.add(issue);
+            stickyNoteList.add(issue, true);
+        }
+    });
+    localStorageClient.setObject(KEY_ISSUE_LIST, issueList.getIssueList());
 }
 
 })();
