@@ -158,8 +158,8 @@ export class StickyNote{
 			progressPer1 = Math.floor((spendTime / estimatedTime) * 100)
 			progressPer2 = Math.floor((addTime / estimatedTime) * 100)
 		} else if(spendTime + addTime > 0) {
-			progressPer1 = Math.floor(spendTime / (spendTime + addTime)) * 100
-			progressPer2 = Math.floor(addTime / (spendTime + addTime)) * 100
+			progressPer1 = Math.floor((spendTime / (spendTime + addTime)) * 100)
+			progressPer2 = 100 - progressPer1
 		} else {
 			progressPer1 = 0
 			progressPer2 = 0
@@ -181,7 +181,7 @@ export class StickyNote{
 			progressBarDom1.classList.add(Bootstrap5.CLASS_BG_DANGER())
 			progressBarDom2.classList.add(Bootstrap5.CLASS_BG_DANGER())
 		}
-		else if(progressPer1 + progressPer2 > 100){
+		else if(progressPer1 + progressPer2 > 110){
 			progressBarDom1.classList.add(Bootstrap5.CLASS_BG_WARNING())
 			progressBarDom2.classList.add(Bootstrap5.CLASS_BG_WARNING())
 		}

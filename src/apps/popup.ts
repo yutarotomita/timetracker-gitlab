@@ -17,7 +17,7 @@ import { WorkingTime } from "../domain/workingTime"
 import { WorkingTimeList } from "../domain/workingTimeList"
 import { StickyNote } from "../domain/stickyNote"
 import { StickyNoteList } from "../domain/stickyNoteList"
-import { isDefined, isUndefined } from "../function/nullCheck"
+import { isDefined } from "../function/nullCheck"
 import { WorkingTimeStickyList } from "../domain/workingTimeStickyList"
 import { IssueDto } from "../domain/issueDto"
 declare let chrome: any;
@@ -46,7 +46,6 @@ const KEY_SELECT_ISSUE_ID = 'select_issue_id'
  * プロフ写真ローカルに保存したい。取得できなくなってたら取り直すとかもしたい
  * ディレクトリ構造を考えて配置したい
  * ローカルストレージの付箋情報は最新化しておきたい
- * getIssueAjaxをprefetchしたい（=callbackではなくPromiseで制御すれば実現できる）
  * json実績のバックアップを取りたい
  * 
  */ 
@@ -61,6 +60,8 @@ let workingTimeList: WorkingTimeList
 let issueList: IssueList
 // spent時にJSON出力するか
 // let isOutputJsonWhenSpent = true
+// GitLabから取得した最新のissueたち。prefech処理で格納される
+let issuesFetch: Array<IIssue>
 
 // ------------------------------------ 画面項目一覧 ------------------------------------ //
 // Spendボタン
@@ -81,36 +82,13 @@ localStorageClient = new LocalStorageWindow() //LocalStorageChrome()
 const logined = loginCheck()
 document.addEventListener("DOMContentLoaded", async function(){
 	if(await logined){
-		let fetch = preFetchAjax()
+		// 先行してAjaxFetch
+		const fetch = preFetchAjax()
+		// 初期表示
 		await initialize()
 		await fetch
-		// gitlabに新しい付箋をfetchして追加
-		gitLabApiClient.getAjaxIssue((rslt: any) => {
-			let tempIssues: Array<IIssue> = []
-			rslt.forEach((issue: IIssue)=>{
-				tempIssues.push(new GitLabIssue(issue))
-			})
-			let tempIssueList = new IssueList()
-			tempIssueList.set(tempIssues)
-			const filterParam = new IssueParam()
-			if(isDefined(loginUser) && isDefined(loginUser.getId())){
-				filterParam.setUserId(loginUser.getId())
-			}
-			filterParam.setActive(true)
-			filterParam.setLabel('Doing')
-			const issueIds = issueList.getAllIds()
-			tempIssueList.filter(filterParam).getIssueList().forEach(issue => {
-				// ローカルストレージにある付箋の場合
-				if(isDefined(issueIds.find(id => id == issue.id))){
-					// FIXME: 付箋情報の更新
-				} else {
-				// ローカルストレージにない、新しい付箋の場合
-					issueList.add(issue)
-					stickyNoteList.add(issue, true)
-				}
-			});
-			localStorageClient.setObject(KEY_ISSUE_LIST, issueList.getIssueList())
-		}, 100, 1)
+		// 取得したissueを元に新しい付箋を追加・更新
+		addStickeyNotes(issuesFetch)
 	}
 	else {
 		window.location.href = './setting.html'
@@ -152,6 +130,14 @@ async function preFetchAjax(){
 		const avatarElement = document.querySelector('.profile-avatar')! // Nullチェック
 		avatarElement.setAttribute('src', loginUser.getImgPath())
 	})
+
+	// issueを最新300コまで取得
+	const issuesPage1 = gitLabApiClient.getIssueByMax(100,1)
+		, issuesPage2 = gitLabApiClient.getIssueByMax(100,2)
+		, issuesPage3 = gitLabApiClient.getIssueByMax(100,3)
+	issuesFetch = (await issuesPage1).concat(await issuesPage2).concat(await issuesPage3)
+
+	return Promise.resolve()
 }
 
 /**
@@ -299,4 +285,35 @@ function iconBadgeToggle(isStart: boolean){
 	chrome.action.setBadgeText({"text" : text})
 	chrome.action.setBadgeBackgroundColor({"color" : color})
 	chrome.action.setBadgeTextColor({"color" : "#FFFFFF"})
+}
+
+/**
+ * issueを付箋に追加する。既に付箋があるissueの場合は情報を更新する
+ * @param issues 
+ */
+function addStickeyNotes(issues: Array<IIssue>){
+	let tempIssues: Array<IIssue> = []
+	issues.forEach((issue: IIssue)=>{
+		tempIssues.push(new GitLabIssue(issue))
+	})
+	let tempIssueList = new IssueList()
+	tempIssueList.set(tempIssues)
+	const filterParam = new IssueParam()
+	if(isDefined(loginUser) && isDefined(loginUser.getId())){
+		filterParam.setUserId(loginUser.getId())
+	}
+	filterParam.setActive(true)
+	filterParam.setLabel('Doing')
+	const issueIds = issueList.getAllIds()
+	tempIssueList.filter(filterParam).getIssueList().forEach(issue => {
+		// ローカルストレージにある付箋の場合
+		if(isDefined(issueIds.find(id => id == issue.id))){
+			// FIXME: 付箋情報の更新
+		} else {
+		// ローカルストレージにない、新しい付箋の場合
+			issueList.add(issue)
+			stickyNoteList.add(issue, true)
+		}
+	});
+	localStorageClient.setObject(KEY_ISSUE_LIST, issueList.getIssueList())
 }
