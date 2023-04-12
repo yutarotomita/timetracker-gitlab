@@ -81,6 +81,12 @@
             <label for="floatingInput">Doing...</label>
           </div> -->
           <div class="col-12">
+            <div class="d-flex align-items-center mt-1 mb-2 mx-1">
+              <i class="bi bi-funnel m-1" style="font-size: x-large;"></i>
+              <span class="stickyNote-badge btn badge rounded-pill bg-success mr-2 shadow-sm">Doing</span>
+              <span class="stickyNote-badge btn badge rounded-pill bg-light text-dark mr-2 shadow-sm">Waiting</span>
+              <span class="stickyNote-badge btn badge rounded-pill bg-light text-dark mr-2 shadow-sm">Todo</span>
+            </div>
             <ul id="issue-list" class="list-group list-group-flush">
             </ul>
           </div>
@@ -131,9 +137,6 @@
             <button type="button" class="btn btn-outline-primary btn-sm mx-1 workingTime-add" data-minitue="30" style="height: fit-content;">+30m</button>
             <button type="button" class="btn btn-outline-primary mx-1 workingTime-add" data-minitue="60" style="height: fit-content;">+1.0h</button>
           </div>
-        </div>
-        <div class="row justify-content-evenly" style="display: none;">
-          0<input type="range" class="form-range workingTime-range" min="0" max="40" step="5" id="" style="width:85%">x2
         </div>
       </div>
     </div>
