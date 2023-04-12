@@ -1066,8 +1066,8 @@ var StickyNote = /** @class */ (function () {
             badgeDom.classList.add(_boostrap5__WEBPACK_IMPORTED_MODULE_3__.Bootstrap5.CLASS_BG_DARK());
         }
         else {
-            badgeDom.innerHTML = issue.getLabels()[0]; //FIXME: 複数ラベルに対応したい
-            if (issue.getLabels()[0] == 'Doing') {
+            badgeDom.innerHTML = issue.getLabels()[0]; //FIXME: 複数ラベルに対応したい。にも対応したい
+            if (issue.getLabels()[0] == 'Doing') { //FIXME: ラベル名と付箋の色をベタ書き対応やめたい
                 badgeDom.classList.add(_boostrap5__WEBPACK_IMPORTED_MODULE_3__.Bootstrap5.CLASS_BG_SUCCESS());
             }
             else if (issue.getLabels()[0] == 'Waiting') {
@@ -2012,7 +2012,7 @@ var KEY_SELECT_ISSUE_ID = 'select_issue_id', KEY_START_DATE = 'start_date', KEY_
  * ディレクトリ構造を考えて配置したい
  * ローカルストレージの付箋情報は最新化しておきたい
  * json実績のバックアップを取りたい
- *
+ * 付箋ラベル名と付箋の色をベタ書き対応やめたい
  */
 // --------------------------------------- 状態一覧 --------------------------------------- //
 var loginUser;
